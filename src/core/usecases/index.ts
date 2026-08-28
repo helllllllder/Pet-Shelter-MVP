@@ -3,3 +3,5 @@ export * from './operator/get-operator-session';
 export * from './shelter/create-shelter';
 export * from './shelter/update-shelter';
 export * from './shelter/list-shelters';
+export * from './pet/create-pet';
+export * from './pet/set-pet-outcome';
