@@ -5,4 +5,5 @@ export * from './operator-repository';
 export * from './shelter-repository';
 export * from './pet-repository';
 export * from './vet-directory-repository';
+export * from './care-event-repository';
 export * from './factory';
