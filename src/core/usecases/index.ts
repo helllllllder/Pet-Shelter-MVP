@@ -5,3 +5,4 @@ export * from './shelter/update-shelter';
 export * from './shelter/list-shelters';
 export * from './pet/create-pet';
 export * from './pet/set-pet-outcome';
+export * from './vet/log-appointment';
