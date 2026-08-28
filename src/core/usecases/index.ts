@@ -7,3 +7,4 @@ export * from './pet/create-pet';
 export * from './pet/set-pet-outcome';
 export * from './vet/log-appointment';
 export * from './care/schedule-care-event';
+export * from './audit/execute-gdpr-erasure';
