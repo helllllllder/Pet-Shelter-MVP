@@ -1,1 +1,2 @@
-// SQLite persistence adapter barrel\nexport {};\n
+export * from './schema';
+export * from './database';
