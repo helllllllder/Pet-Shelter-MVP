@@ -1,8 +1,9 @@
-import { IShelterSession, IPetRepository, IOperatorRepository, IShelterRepository, IVetDirectoryRepository } from '@core/contracts';
+import { IShelterSession, IPetRepository, IOperatorRepository, IShelterRepository, IVetDirectoryRepository, ICareEventRepository } from '@core/contracts';
 import { DrizzlePetRepository } from './pet-repository';
 import { DrizzleOperatorRepository } from './operator-repository';
 import { DrizzleShelterRepository } from './shelter-repository';
 import { DrizzleVetDirectoryRepository } from './vet-directory-repository';
+import { DrizzleCareEventRepository } from './care-event-repository';
 
 export class ScopedRepositoryFactory {
   constructor(private readonly db: any) {}
@@ -31,5 +32,9 @@ export class ScopedRepositoryFactory {
 
   getVetDirectoryRepository(session: IShelterSession): DrizzleVetDirectoryRepository {
     return new DrizzleVetDirectoryRepository(session, this.db);
+  }
+
+  getCareEventRepository(session: IShelterSession): ICareEventRepository {
+    return new DrizzleCareEventRepository(session, this.db);
   }
 }
