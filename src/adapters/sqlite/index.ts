@@ -1,0 +1,1 @@
+// SQLite persistence adapter barrel\nexport {};\n

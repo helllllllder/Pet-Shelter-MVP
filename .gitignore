@@ -4,10 +4,12 @@
 AGENTS.md
 skills-lock.json
 
-# Node modules (if code is added later)
+# Node modules & build artifacts
 node_modules/
 dist/
 build/
+.expo/
+.expo-shared/
 
 # OS files
 .DS_Store
