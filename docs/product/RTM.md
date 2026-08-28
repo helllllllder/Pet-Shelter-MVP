@@ -1,0 +1,295 @@
+# Requirements Traceability Matrix: Luna's Pet Central
+
+**Version**: 2.0  
+**Date**: 2026-08-28  
+**Source Documents**: BRD v3.0, PRD v3.0
+
+---
+
+## 1. FR → NFR Mapping
+
+This table maps each Functional Requirement to the Non-Functional Requirements that constrain or govern it.
+
+| FR ID | FR Name | Related NFRs | Rationale |
+| :--- | :--- | :--- | :--- |
+| FR01 | Local operator profile registration & offline access | NFR01 (Usability), NFR08 (Data Isolation) | Local profile must be simple to complete (usability). Profile data is stored locally and scoped to the device (data isolation at device level). |
+| FR02 | Local shelter creation & multi-shelter management | NFR01 (Usability), NFR08 (Data Isolation) | Shelter creation must be straightforward (usability). Each shelter is an independent data container with enforced isolation (data isolation). |
+| FR03 | Local data export for portability | NFR01 (Usability), NFR15 (Backup & DR) | Export must be easy to initiate (usability). Export serves as the Phase 1 backup mechanism (backup & DR). |
+| FR04 | Single-user shelter context switching | NFR01 (Usability), NFR02 (Performance), NFR08 (Data Isolation) | Context switching must be fast and intuitive (usability, performance). Switching enforces data isolation between shelters. |
+| FR05 | Pet profile creation and management | NFR01 (Usability), NFR02 (Performance), NFR07 (Access Control), NFR08 (Data Isolation), NFR09 (Medical Privacy), NFR13 (Audit Logging), NFR17 (Global Search) | Pet registration must be completable in < 5 clicks (usability). Profile pages must load in < 2s (performance). Health data is private (medical privacy). Records are shelter-scoped (data isolation), access-controlled, and searchable via global search. Creation is audited. |
+| FR06 | Adoption availability flag toggle | NFR01 (Usability), NFR07 (Access Control), NFR13 (Audit Logging) | Toggle must be simple (usability), restricted to Staff+ (access control), and logged (audit). |
+| FR07 | Pet media upload (photos/videos) | NFR02 (Performance), NFR07 (Access Control), NFR09 (Medical Privacy), NFR11 (Asset Protection), NFR13 (Audit Logging) | Media must load performantly. Uploads are restricted to Staff+. Media is included in shareable links but must not be guessable via public URLs (asset protection). Uploads are audited. |
+| FR08 | Pet lifecycle outcomes (Adopted, Deceased, Transferred, In Foster) | NFR01 (Usability), NFR07 (Access Control), NFR08 (Data Isolation), NFR13 (Audit Logging), NFR16 (Data Retention & GDPR) | Outcome transitions must be straightforward (usability). Only Staff+ can set outcomes (access control). Archived pets remain in the data store (data retention). Outcome changes are significant audit events. Data isolation applies for internal transfers across shelters. |
+| FR09 | Adopter details capture on adoption | NFR07 (Access Control), NFR09 (Medical Privacy), NFR13 (Audit Logging), NFR16 (Data Retention & GDPR) | Adopter details contain PII — accessible only to authenticated staff (privacy), gated by role (access control), subject to GDPR deletion (data retention), and audited. |
+| FR10 | Shadow record creation for internal transfers | NFR07 (Access Control), NFR08 (Data Isolation), NFR09 (Medical Privacy), NFR13 (Audit Logging), NFR15 (Backup & DR) | Shadow records span shelter boundaries, requiring careful data isolation enforcement. Medical history is transferred (privacy concern). Transfer events are audited. Record integrity must survive disasters (backup). |
+| FR11 | Veterinary clinic and professional directory | NFR01 (Usability), NFR02 (Performance), NFR07 (Access Control), NFR08 (Data Isolation), NFR17 (Global Search) | Directory must be fast and searchable (performance, global search). Entries are shelter-scoped (data isolation). Only Staff+ can add entries (access control). Must be easy to use (usability). |
+| FR12 | Veterinary appointment logging | NFR01 (Usability), NFR02 (Performance), NFR07 (Access Control), NFR09 (Medical Privacy), NFR13 (Audit Logging) | Appointments are medical records (privacy), must be logged efficiently (usability, performance), restricted to Staff+ (access control), and audited. |
+| FR13 | Veterinary document upload and storage | NFR02 (Performance), NFR07 (Access Control), NFR09 (Medical Privacy), NFR11 (Asset Protection), NFR13 (Audit Logging), NFR15 (Backup & DR) | Documents contain sensitive medical data (privacy). Must not be accessible via guessable URLs (asset protection). Uploads must be performant and backed up. Document uploads are audited. |
+| FR14 | Appointment soft delete with reference preservation | NFR07 (Access Control), NFR09 (Medical Privacy), NFR13 (Audit Logging), NFR16 (Data Retention & GDPR) | Soft-deleted records are retained (data retention). Deletion is restricted to Staff+ (access control). Medical data remains in the data store for referential integrity (privacy). Deletions are audited. |
+| FR15 | Pet care event recording | NFR01 (Usability), NFR02 (Performance), NFR07 (Access Control), NFR09 (Medical Privacy), NFR13 (Audit Logging) | Care events are medical records (privacy), must be completable in < 5 clicks (usability), load quickly (performance), restricted to Staff+ (access control), and audited. |
+| FR16 | Care event and appointment optional linking | NFR07 (Access Control), NFR09 (Medical Privacy), NFR13 (Audit Logging) | Linking connects medical records (privacy). Restricted to Staff+ (access control). Link creation/modification is audited. |
+| FR17 | Care event due-date in-app notification | NFR05 (In-app Notification Reliability), NFR07 (Access Control), NFR14 (Notification Privacy) | Notifications must be delivered within 5 seconds (reliability). Only shelter staff receive them (access control). If escalated to email, must not contain sensitive medical data (notification privacy). |
+| FR18 | Proactive care event reminders (7, 3, 1 day before) | NFR05 (In-app Notification Reliability), NFR07 (Access Control), NFR14 (Notification Privacy) | Proactive reminders must be delivered within 5 seconds (reliability). Scoped to shelter staff (access control). External delivery must not include medical details (notification privacy). |
+| FR19 | Categorized inventory management | NFR01 (Usability), NFR02 (Performance), NFR07 (Access Control), NFR08 (Data Isolation), NFR13 (Audit Logging), NFR17 (Global Search) | Inventory is shelter-scoped (data isolation). Must be easy to manage (usability), load quickly (performance), restricted to Staff+ for edits (access control), searchable (global search), and adjustments are audited. |
+| FR20 | Per-item inventory alert rules (quantity threshold, expiration window) | NFR05 (In-app Notification Reliability), NFR07 (Access Control), NFR13 (Audit Logging), NFR14 (Notification Privacy) | Alerts must fire reliably within 5 seconds in-app (reliability). Configuration is restricted to Staff+ (access control). Alert events are audited. External notifications must not contain sensitive data (notification privacy). |
+| FR21 | Inventory usage templates (1-click decrement from care events) | NFR01 (Usability), NFR02 (Performance), NFR07 (Access Control), NFR13 (Audit Logging) | 1-click decrement is a usability optimization. Must be fast (performance). Restricted to Staff+ (access control). Decrements and reversals are fully tracked in the audit log. |
+| FR22 | Maintenance task creation, scheduling, and assignment | NFR01 (Usability), NFR02 (Performance), NFR07 (Access Control), NFR08 (Data Isolation), NFR13 (Audit Logging), NFR17 (Global Search) | Tasks must be easy to create (usability), load quickly (performance), shelter-scoped (data isolation), restricted to Staff+ (access control), searchable (global search), and audited. |
+| FR23 | Maintenance task notifications and completion tracking | NFR05 (In-app Notification Reliability), NFR06 (Email/Push Reliability), NFR07 (Access Control), NFR13 (Audit Logging), NFR14 (Notification Privacy) | Task notifications must be delivered within 5 seconds in-app (NFR05) and 60 seconds for email/push (NFR06). Completion logging is audited. External notifications must not contain sensitive data (notification privacy). |
+| FR24 | Two-tier notification delivery (Standard in-app + Custom email/push) | NFR05 (In-app Notification Reliability), NFR06 (Email/Push Reliability), NFR07 (Access Control), NFR14 (Notification Privacy) | In-app must deliver within 5 seconds (NFR05); email/push within 60 seconds (NFR06). Configuration is per-user/per-event (access control). External notifications must not contain medical data (notification privacy). |
+| FR25 | Notification delivery status tracking and failure escalation | NFR05 (In-app Notification Reliability), NFR06 (Email/Push Reliability), NFR13 (Audit Logging) | Failure escalation depends on reliable in-app delivery for the banner (NFR05). Retry policy aligns with NFR06's 3-retry requirement. Delivery failures and acknowledgments are audited. |
+| FR26 | Shareable pet profile link generation (Adoption or Veterinary type) | NFR07 (Access Control), NFR09 (Medical Privacy), NFR10 (Link Anonymity), NFR11 (Asset Protection), NFR12 (Link Integrity), NFR13 (Audit Logging) | Veterinary links expose medical data (privacy); links must use opaque tokens (anonymity); media assets must not be guessable (asset protection); revoked/expired links must be invalidated (integrity). Link generation is audited. Only Staff+ can generate (access control). |
+| FR27 | Configurable link TTL (max 90 days, renewable, no permanent option) | NFR09 (Medical Privacy), NFR10 (Link Anonymity), NFR12 (Link Integrity), NFR13 (Audit Logging) | TTL limits medical data exposure window (privacy). Expired links must be permanently invalidated (integrity). Link URLs use opaque tokens (anonymity). Renewals are audited. |
+| FR28 | Link generation restrictions | NFR07 (Access Control), NFR09 (Medical Privacy), NFR12 (Link Integrity), NFR13 (Audit Logging) | Restrictions prevent unauthorized data exposure for archived pets (privacy, integrity). Enforcement is role-gated (access control). Restriction enforcement events are audited. |
+| FR29 | Manual link revocation | NFR07 (Access Control), NFR09 (Medical Privacy), NFR12 (Link Integrity), NFR13 (Audit Logging) | Revocation immediately cuts off external access to data (privacy, integrity). Only authorized staff can revoke (access control). Revocations are audited. |
+| FR30 | Search and filtering across pets, inventory, maintenance | NFR01 (Usability), NFR02 (Performance), NFR07 (Access Control), NFR08 (Data Isolation), NFR17 (Global Search) | Search must return results in < 300ms (performance). Results are shelter-scoped (data isolation). Only authorized users can search (access control). FR30 is a core implementation of NFR17 (global search). Must be intuitive (usability). |
+| FR31 | Per-shelter dashboard overview | NFR01 (Usability), NFR02 (Performance), NFR07 (Access Control), NFR08 (Data Isolation) | Dashboard must render in < 1 second (performance). KPIs are shelter-scoped (data isolation). Accessible to authorized users only (access control). Must be intuitive and informative (usability). |
+| FR32 | Pet reports (census, archived log, treatment list) | NFR01 (Usability), NFR02 (Performance), NFR07 (Access Control), NFR08 (Data Isolation), NFR09 (Medical Privacy) | Reports contain medical and PII data (privacy). Restricted to Admin and Staff (access control). Must generate quickly (performance). Shelter-scoped (data isolation). Must be easy to generate (usability). |
+| FR33 | Inventory reports (status, alert history) | NFR01 (Usability), NFR02 (Performance), NFR07 (Access Control), NFR08 (Data Isolation) | Reports must generate quickly (performance). Shelter-scoped (data isolation). Restricted to authorized roles (access control). Must be easy to generate (usability). |
+| FR34 | Maintenance reports (scheduled, completed, overdue) | NFR01 (Usability), NFR02 (Performance), NFR07 (Access Control), NFR08 (Data Isolation) | Reports must generate quickly (performance). Shelter-scoped (data isolation). Restricted to authorized roles (access control). Must be easy to generate (usability). |
+| FR35 | Staff and care event reports | NFR01 (Usability), NFR02 (Performance), NFR07 (Access Control), NFR08 (Data Isolation), NFR09 (Medical Privacy) | Staff reports contain role data; care event reports contain medical data (privacy). Restricted by role (access control). Shelter-scoped (data isolation). Must be performant and usable. |
+| FR36 | Shareable link activity log | NFR07 (Access Control), NFR08 (Data Isolation), NFR09 (Medical Privacy), NFR13 (Audit Logging) | Activity logs may reference medical link types (privacy). Restricted to Admins only (access control). Shelter-scoped (data isolation). Log entries are part of the audit trail. |
+| FR37 | User registration and authentication via Google SSO | NFR07 (Access Control), NFR08 (Data Isolation), NFR13 (Audit Logging) | SSO is the Phase 3 authentication gateway enforcing role-based access. Account creation is a significant action requiring audit logging. Data isolation begins at authentication. |
+| FR38 | Shelter admin role assignment on creation | NFR07 (Access Control), NFR08 (Data Isolation), NFR13 (Audit Logging) | Shelter creation assigns the Admin role (access control) and establishes a new data isolation boundary. Shelter creation is a significant auditable action. |
+| FR39 | Staff invite link generation and redemption | NFR07 (Access Control), NFR08 (Data Isolation), NFR10 (Link Anonymity), NFR13 (Audit Logging) | Invite links assign roles (access control) and grant access to a shelter's data scope. Links must use opaque tokens (link anonymity). Role assignments and invite events are auditable. |
+| FR40 | Role-based access control (Admin, Staff, Read-only) | NFR07 (Access Control), NFR08 (Data Isolation), NFR13 (Audit Logging) | FR40 is the direct implementation of NFR07. Role changes affect data isolation scope and are audited. |
+
+---
+
+## 2. FR → Edge Case Mapping
+
+This table maps each FR to the edge cases that test its boundaries.
+
+| FR ID | FR Name | Related Edge Cases |
+| :--- | :--- | :--- |
+| FR01 | Local operator profile registration & offline access | **Profile data validation** — System validates required fields (name, contact/email) before saving. Incomplete submissions are rejected with field-level errors. |
+| FR02 | Local shelter creation & multi-shelter management | **Duplicate shelter names** — Non-unique shelter names are allowed since isolation is per-shelter data container. |
+| FR03 | Local data export for portability | **Export with large data volume** — Export of shelters with extensive records (thousands of pets, media references) must complete without data loss; progress indication shown for long-running exports. **Device storage full** — If insufficient local storage exists to save the export, the system displays a clear error and does not produce a partial file. |
+| FR04 | Single-user shelter context switching | **Switching with unsaved changes** — If the operator has unsaved work in the current shelter context, the system warns before switching and offers to save or discard. |
+| FR05 | Pet profile creation and management | **Duplicate pet profiles** — System does not enforce uniqueness; staff use manual review. **DOB is approximate (estimated flag)** — Estimated DOB is stored normally but displayed with '(Estimated)' label everywhere. **Intake origin 'Other' handling** — 'Other' triggers a required free-text field; stored as enum 'OTHER' + description. |
+| FR07 | Pet media upload (photos/videos) | **Upload failure mid-transfer** — Partial uploads are discarded; user is prompted to retry; no partial files persisted. |
+| FR08 | Pet lifecycle outcomes (Adopted, Deceased, Transferred, In Foster) | **Archived pet with active care events** — All pending/future care events are auto-cancelled on archival; past completed occurrences preserved; shareable links auto-revoked. **Shelter merged/closed** — All pets must be individually resolved before closure; closed shelters retain historical data in read-only mode. |
+| FR09 | Adopter details capture on adoption | **Adopter details missing when setting Adopted status** — Submission is blocked with validation errors until all fields (Name, Phone, Address) are complete. |
+| FR10 | Shadow record creation for internal transfers | **Pet transferred internally then externally from new shelter** — New shelter treats pet as its own; external transfer archives at new shelter; original shadow record remains unchanged. **Staff attempts to transfer a pet to a closed/deleted shelter** — Blocked at selection or mid-transfer. **Pet with active shareable links is transferred internally** — Links auto-revoked at origin; zero links at destination. |
+| FR11 | Veterinary clinic and professional directory | **Duplicate vet directory entries** — Does not enforce strict uniqueness but warns the user. **Deleting a vet entry referenced by existing appointments** — Hard-deletion prevented; soft-deletion offered instead. |
+| FR12 | Veterinary appointment logging | **Retroactive appointment validation** — Allows past dates but prompts user for confirmation. |
+| FR13 | Veterinary document upload and storage | **Upload failure mid-transfer** — Partial uploads are discarded; user is prompted to retry; no partial files persisted. |
+| FR14 | Appointment soft delete with reference preservation | **Deleted appointment linked to care events** — Soft delete is performed; linked care events display placeholder text: 'Originally linked to appointment [DELETED: YYYY-MM-DD]'. |
+| FR16 | Care event and appointment optional linking | **Deleted appointment linked to care events** — Soft delete preserves the care event's operational integrity; placeholder text shown on linked care events. |
+| FR18 | Proactive care event reminders (7, 3, 1 day before) | **Care event created with < 7 days until due** — Only applicable future reminders are sent (e.g., skips 7-day and 3-day reminders if created 2 days prior). |
+| FR19 | Categorized inventory management | **Concurrent inventory edits by multiple staff** — Second save is rejected with a conflict error and a data comparison view for reconciliation. |
+| FR21 | Inventory usage templates (1-click decrement from care events) | **Concurrent inventory edits by multiple staff** — Concurrent decrements must not silently overwrite; conflict resolution applies. |
+| FR25 | Notification delivery status tracking and failure escalation | **Notification delivery failure after retries** — After 3 failed retries, notification is flagged 'FAILED'; non-dismissible in-app banner shown until acknowledged. |
+| FR26 | Shareable pet profile link generation (Adoption or Veterinary type) | **Expired/revoked link accessed** — System returns a clear, non-revealing denial page with no data, error details, or internal identifiers exposed. **Archived pet with active care events** — All active shareable links auto-revoked on archival; new links forbidden. |
+| FR27 | Configurable link TTL (max 90 days, renewable, no permanent option) | **Expired/revoked link accessed** — Expired link returns denial page; no cached or stale data served. |
+| FR28 | Link generation restrictions | **Archived pet with active care events** — New shareable links are strictly forbidden for archived pets. |
+| FR29 | Manual link revocation | **Expired/revoked link accessed** — Revoked link immediately and permanently returns denial response. |
+| FR30 | Search and filtering across pets, inventory, maintenance | **Search yields empty results** — Graceful empty state shown instead of raw database errors. |
+| FR31 | Per-shelter dashboard overview | **Stale dashboard data** — Caches data for performance but auto-refreshes after 5 mins of inactivity or manually. |
+| FR32-FR36 | Reports | **Large datasets in reports** — Paginates on-screen and offers async export for >1000 rows. |
+| FR37 | User registration and authentication via Google SSO | **Google SSO provider temporarily unavailable** — System handles outages gracefully without losing active sessions. Displays a clear error page if SSO is temporarily unavailable. |
+| FR38 | Shelter admin role assignment on creation | **Duplicate shelter names** — Non-unique names are allowed since isolation is tenant-based. |
+| FR39 | Staff invite link generation and redemption | **Email mismatch on invite redemption** — Rejects redemption if authenticated email differs from invited email. **Expired invite link access** — Returns clear error for expired invitations. |
+| FR40 | Role-based access control (Admin, Staff, Read-only) | **Last Admin leaves a shelter** — System prevents the last Admin from being removed; must promote another user first or delete the shelter entirely. |
+
+---
+
+## 3. FR → State Machine Mapping
+
+This table maps each FR to the state machine(s) it participates in.
+
+| FR ID | FR Name | State Machine(s) |
+| :--- | :--- | :--- |
+| FR03 | Local data export for portability | *(No state machine — export is a single action: Initiated → Completed/Failed)* |
+| FR05 | Pet profile creation and management | Pet Lifecycle (Intake → Active) |
+| FR06 | Adoption availability flag toggle | Pet Lifecycle (flag is auto-cleared on archival transitions) |
+| FR08 | Pet lifecycle outcomes (Adopted, Deceased, Transferred, In Foster) | Pet Lifecycle (Active → In Foster, Active → Adopted → Archived, Active → Deceased → Archived, Active → Transferred → Archived), Care Event (Scheduled → Cancelled on archival) |
+| FR09 | Adopter details capture on adoption | Pet Lifecycle (Active → Adopted → Archived — adoption form is required during this transition) |
+| FR10 | Shadow record creation for internal transfers | Pet Lifecycle (Active → Transferred (Internal) → Archived) |
+| FR12 | Veterinary appointment logging | Appointment Lifecycle (Active) |
+| FR14 | Appointment soft delete with reference preservation | Appointment Lifecycle (Active → Soft-Deleted) |
+| FR15 | Pet care event recording | Care Event Lifecycle (creation of Scheduled state) |
+| FR17 | Care event due-date in-app notification | Care Event Lifecycle (Due state transition triggers notification), Notification (Pending → Delivered) |
+| FR18 | Proactive care event reminders (7, 3, 1 day before) | Care Event Lifecycle (Scheduled → Reminder Sent 7d → 3d → 1d → Due) |
+| FR22 | Maintenance task creation, scheduling, and assignment | Maintenance Task Lifecycle (Created → Assigned) |
+| FR23 | Maintenance task notifications and completion tracking | Maintenance Task Lifecycle (In Progress → Completed, Created/Assigned → Overdue), Notification (Pending → Delivered) |
+| FR24 | Two-tier notification delivery (Standard in-app + Custom email/push) | Notification Lifecycle (Pending → Delivered or Pending → Retrying) |
+| FR25 | Notification delivery status tracking and failure escalation | Notification Lifecycle (Retrying 1 → 2 → 3 → Failed → Acknowledged) |
+| FR26 | Shareable pet profile link generation (Adoption or Veterinary type) | Shareable Link Lifecycle (creation of Active state) |
+| FR27 | Configurable link TTL (max 90 days, renewable, no permanent option) | Shareable Link Lifecycle (Active → Expired, Active → Renewed → Active) |
+| FR28 | Link generation restrictions | Shareable Link Lifecycle (governs whether Active state can be created), Pet Lifecycle (archival auto-revokes links) |
+| FR29 | Manual link revocation | Shareable Link Lifecycle (Active → Revoked) |
+| FR39 | Staff invite link generation and redemption | Invite Link Lifecycle (Pending → Redeemed / Expired / Invalidated) |
+
+---
+
+## 4. FR → Process Flow Mapping
+
+This table maps each FR to the process flow(s) where it appears.
+
+| FR ID | FR Name | Process Flow(s) |
+| :--- | :--- | :--- |
+| FR01 | Local operator profile registration & offline access | 1. Operator Registration and Local Shelter Setup |
+| FR02 | Local shelter creation & multi-shelter management | 1. Operator Registration and Local Shelter Setup |
+| FR03 | Local data export for portability | 12. Data Export |
+| FR04 | Single-user shelter context switching | 1. Operator Registration and Local Shelter Setup (shelter selector usage) |
+| FR05 | Pet profile creation and management | 2. Pet Registration |
+| FR06 | Adoption availability flag toggle | 2. Pet Registration, 7. Profile Sharing (prerequisite for Adoption links) |
+| FR07 | Pet media upload (photos/videos) | 2. Pet Registration, 7. Profile Sharing (media visible in shared profiles) |
+| FR08 | Pet lifecycle outcomes (Adopted, Deceased, Transferred, In Foster) | 8. Pet Archiving and Transfer |
+| FR09 | Adopter details capture on adoption | 8. Pet Archiving and Transfer (Adopted outcome requires adopter form) |
+| FR10 | Shadow record creation for internal transfers | 8. Pet Archiving and Transfer (Internal transfer creates shadow record) |
+| FR11 | Veterinary clinic and professional directory | 3. Veterinary Appointment |
+| FR12 | Veterinary appointment logging | 3. Veterinary Appointment |
+| FR13 | Veterinary document upload and storage | 3. Veterinary Appointment |
+| FR14 | Appointment soft delete with reference preservation | 3. Veterinary Appointment (deletion rules for linked appointments) |
+| FR15 | Pet care event recording | 4. Pet Care Event |
+| FR16 | Care event and appointment optional linking | 3. Veterinary Appointment, 4. Pet Care Event |
+| FR17 | Care event due-date in-app notification | 4. Pet Care Event, 9. Notification Failure Escalation |
+| FR18 | Proactive care event reminders (7, 3, 1 day before) | 4. Pet Care Event, 9. Notification Failure Escalation |
+| FR19 | Categorized inventory management | 5. Inventory Management and Alert |
+| FR20 | Per-item inventory alert rules (quantity threshold, expiration window) | 5. Inventory Management and Alert |
+| FR21 | Inventory usage templates (1-click decrement from care events) | 4. Pet Care Event, 5. Inventory Management and Alert |
+| FR22 | Maintenance task creation, scheduling, and assignment | 6. Maintenance Task |
+| FR23 | Maintenance task notifications and completion tracking | 6. Maintenance Task, 9. Notification Failure Escalation |
+| FR24 | Two-tier notification delivery (Standard in-app + Custom email/push) | 5. Inventory Management and Alert, 6. Maintenance Task, 9. Notification Failure Escalation |
+| FR25 | Notification delivery status tracking and failure escalation | 5. Inventory Management and Alert, 9. Notification Failure Escalation |
+| FR26 | Shareable pet profile link generation (Adoption or Veterinary type) | 7. Profile Sharing |
+| FR27 | Configurable link TTL (max 90 days, renewable, no permanent option) | 7. Profile Sharing |
+| FR28 | Link generation restrictions | 7. Profile Sharing, 8. Pet Archiving and Transfer (new links forbidden for archived pets) |
+| FR29 | Manual link revocation | 7. Profile Sharing |
+| FR30 | Search and filtering across pets, inventory, maintenance | 11. Dashboard and Search Usage |
+| FR31 | Per-shelter dashboard overview | 11. Dashboard and Search Usage |
+| FR32 | Pet reports (census, archived log, treatment list) | 10. Report Generation and Consumption |
+| FR33 | Inventory reports (status, alert history) | 10. Report Generation and Consumption |
+| FR34 | Maintenance reports (scheduled, completed, overdue) | 10. Report Generation and Consumption |
+| FR35 | Staff and care event reports | 10. Report Generation and Consumption |
+| FR36 | Shareable link activity log | 10. Report Generation and Consumption |
+| FR37 | User registration and authentication via Google SSO | 1. Operator Registration and Local Shelter Setup (Phase 3 replaces local profile with SSO) |
+| FR38 | Shelter admin role assignment on creation | 1. Operator Registration and Local Shelter Setup (Phase 3 adds admin role assignment) |
+| FR39 | Staff invite link generation and redemption | 1. Operator Registration and Local Shelter Setup (Phase 3 adds staff onboarding) |
+| FR40 | Role-based access control (Admin, Staff, Read-only) | 1. Operator Registration and Local Shelter Setup (Phase 3 adds role enforcement on all operations) |
+
+---
+
+## 5. FR → BRD Success Criteria Mapping
+
+This table maps FRs to the Business Success Criteria (KPIs) they support.
+
+| FR ID | FR Name | BRD KPI(s) Supported |
+| :--- | :--- | :--- |
+| FR01 | Local operator profile registration & offline access | KPI-07 (Operator engagement): Frictionless local access removes barriers to daily use. |
+| FR02 | Local shelter creation & multi-shelter management | KPI-05 (Administrative overhead): Self-service local shelter setup reduces setup time. KPI-07 (Operator engagement): Multi-shelter capability supports operational growth. |
+| FR03 | Local data export for portability | KPI-04 (Lost medical records): Data exports serve as backup, preventing data loss. KPI-05 (Administrative overhead): Export simplifies future migration. |
+| FR04 | Single-user shelter context switching | KPI-05 (Administrative overhead): Quick context switching reduces time navigating between shelters. |
+| FR05 | Pet profile creation and management | KPI-01 (Time to retrieve medical record): Structured digital profiles enable instant retrieval. KPI-04 (Lost medical records): Digital profiles eliminate paper-loss risk. KPI-05 (Administrative overhead): Replaces manual paper filing. |
+| FR06 | Adoption availability flag toggle | KPI-06 (Adoption rate): Enables adoption-eligible pets to be discoverable. |
+| FR07 | Pet media upload (photos/videos) | KPI-06 (Adoption rate): Photos/videos in adoption profiles increase adopter engagement. |
+| FR08 | Pet lifecycle outcomes (Adopted, Deceased, Transferred, In Foster) | KPI-05 (Administrative overhead): Digital lifecycle tracking replaces manual records. KPI-06 (Adoption rate): Accurate tracking of adoption outcomes. |
+| FR09 | Adopter details capture on adoption | KPI-06 (Adoption rate): Structured adoption records support better follow-up. KPI-05 (Administrative overhead): Digital capture replaces paper forms. |
+| FR10 | Shadow record creation for internal transfers | KPI-04 (Lost medical records): Transfer preserves full history via shadow records. KPI-03 (Treatment compliance): Active treatments are migrated to the receiving shelter. |
+| FR11 | Veterinary clinic and professional directory | KPI-01 (Time to retrieve medical record): Quick vet lookup during appointments. KPI-05 (Administrative overhead): Reusable directory eliminates redundant data entry. |
+| FR12 | Veterinary appointment logging | KPI-01 (Time to retrieve medical record): Appointments are part of retrievable medical history. KPI-04 (Lost medical records): Digital appointment records cannot be physically lost. |
+| FR13 | Veterinary document upload and storage | KPI-01 (Time to retrieve medical record): Documents are digitally attached and searchable. KPI-04 (Lost medical records): Uploaded documents replace paper originals. |
+| FR14 | Appointment soft delete with reference preservation | KPI-04 (Lost medical records): Soft delete preserves data integrity; linked references remain. |
+| FR15 | Pet care event recording | KPI-01 (Time to retrieve medical record): Care events are part of the digital record. KPI-03 (Treatment compliance): Structured scheduling ensures treatments are tracked. KPI-04 (Lost medical records): Digital care records are permanent. |
+| FR16 | Care event and appointment optional linking | KPI-01 (Time to retrieve medical record): Bidirectional links enable fast cross-referencing between appointments and care events. |
+| FR17 | Care event due-date in-app notification | KPI-03 (Treatment compliance): On-due-date alerts ensure no treatment is missed. |
+| FR18 | Proactive care event reminders (7, 3, 1 day before) | KPI-03 (Treatment compliance): Advance reminders give staff time to prepare and schedule. |
+| FR19 | Categorized inventory management | KPI-02 (Expired inventory waste): Tracking expiration dates prevents waste. KPI-05 (Administrative overhead): Digital inventory replaces manual tracking. |
+| FR20 | Per-item inventory alert rules (quantity threshold, expiration window) | KPI-02 (Expired inventory waste): Proactive expiration alerts prevent items from going unnoticed. KPI-05 (Administrative overhead): Automated alerts replace manual checks. |
+| FR21 | Inventory usage templates (1-click decrement from care events) | KPI-02 (Expired inventory waste): Accurate usage tracking prevents over-stocking. KPI-03 (Treatment compliance): Links care administration to inventory for accountability. KPI-05 (Administrative overhead): 1-click workflow saves time. |
+| FR22 | Maintenance task creation, scheduling, and assignment | KPI-05 (Administrative overhead): Digital scheduling replaces verbal coordination. |
+| FR23 | Maintenance task notifications and completion tracking | KPI-05 (Administrative overhead): Automated notifications eliminate verbal reminders. KPI-07 (Staff platform adoption): Reliable alerts build trust in the platform. |
+| FR24 | Two-tier notification delivery (Standard in-app + Custom email/push) | KPI-03 (Treatment compliance): Multi-channel delivery ensures critical reminders are received. KPI-07 (Staff platform adoption): Flexible notification preferences improve UX. |
+| FR25 | Notification delivery status tracking and failure escalation | KPI-03 (Treatment compliance): Failure escalation ensures no notification silently fails. KPI-07 (Staff platform adoption): Transparency into delivery status builds platform trust. |
+| FR26 | Shareable pet profile link generation (Adoption or Veterinary type) | KPI-01 (Time to retrieve medical record): Veterinary links provide instant access to medical data. KPI-06 (Adoption rate): Adoption links enable remote profile browsing. |
+| FR27 | Configurable link TTL (max 90 days, renewable, no permanent option) | KPI-06 (Adoption rate): Renewable links ensure profiles remain available during adoption cycles. |
+| FR28 | Link generation restrictions | KPI-06 (Adoption rate): Ensures only genuinely available pets have adoption links. |
+| FR29 | Manual link revocation | KPI-06 (Adoption rate): Keeps shared profile inventory current by removing stale links. |
+| FR30 | Search and filtering across pets, inventory, maintenance | KPI-01 (Time to retrieve medical record): Fast search enables rapid record retrieval. KPI-05 (Administrative overhead): Filters reduce time spent locating information. |
+| FR31 | Per-shelter dashboard overview | KPI-05 (Administrative overhead): At-a-glance overview eliminates manual status compilation. KPI-07 (Staff platform adoption): A rich dashboard is the operational hub driving daily usage. |
+| FR32 | Pet reports (census, archived log, treatment list) | KPI-03 (Treatment compliance): Treatment lists enable compliance monitoring. KPI-05 (Administrative overhead): Automated reports replace manual compilation. KPI-06 (Adoption rate): Archived adoption logs support outcome tracking. |
+| FR33 | Inventory reports (status, alert history) | KPI-02 (Expired inventory waste): Status reports highlight at-risk items. KPI-05 (Administrative overhead): Automated inventory reporting. |
+| FR34 | Maintenance reports (scheduled, completed, overdue) | KPI-05 (Administrative overhead): Automated maintenance reporting with attribution. |
+| FR35 | Staff and care event reports | KPI-03 (Treatment compliance): Care event summaries enable compliance auditing. KPI-05 (Administrative overhead): Automated staff and activity reporting. KPI-07 (Staff platform adoption): Staff headcount reports track active platform users. |
+| FR36 | Shareable link activity log | KPI-05 (Administrative overhead): Automated logging replaces manual link tracking. KPI-06 (Adoption rate): Link activity data reveals adoption funnel engagement. |
+| FR37 | User registration and authentication via Google SSO | KPI-07 (Operator engagement): SSO simplifies onboarding for multi-user scenarios in Phase 3, driving adoption. |
+| FR38 | Shelter admin role assignment on creation | KPI-05 (Administrative overhead): Self-service shelter setup with automatic admin assignment reduces onboarding overhead. KPI-07 (Operator engagement). |
+| FR39 | Staff invite link generation and redemption | KPI-05 (Administrative overhead): Streamlined staff onboarding via invite links. KPI-07 (Operator engagement): Frictionless joining flow for new staff. |
+| FR40 | Role-based access control (Admin, Staff, Read-only) | KPI-07 (Operator engagement): Role clarity encourages confident multi-user usage. |
+
+---
+
+## 6. NFR → FR Coverage Summary
+
+A reverse mapping showing which FRs are governed by each NFR.
+
+| NFR ID | NFR Name | Governing FRs |
+| :--- | :--- | :--- |
+| NFR01 | Usability | FR01, FR02, FR03, FR04, FR05, FR06, FR08, FR11, FR15, FR19, FR21, FR22, FR30, FR31, FR32, FR33, FR34, FR35 |
+| NFR02 | Performance | FR05, FR07, FR11, FR12, FR13, FR15, FR19, FR21, FR22, FR30, FR31, FR32, FR33, FR34, FR35 |
+| NFR03 | Availability | *(Cross-cutting — applies to all FRs as a system-wide uptime target; no FR-specific mapping)* |
+| NFR04 | Scalability | *(Cross-cutting — applies to all FRs as a system-wide capacity target; no FR-specific mapping)* |
+| NFR05 | In-app Notification Reliability | FR17, FR18, FR20, FR23, FR24, FR25 |
+| NFR06 | Email/Push Notification Reliability | FR23, FR24, FR25 |
+| NFR07 | Access Control Enforcement | FR05, FR06, FR07, FR08, FR09, FR10, FR12, FR13, FR14, FR15, FR16, FR17, FR18, FR19, FR20, FR21, FR22, FR23, FR24, FR26, FR27, FR28, FR29, FR30, FR31, FR32, FR33, FR34, FR35, FR36, FR37, FR38, FR39, FR40 |
+| NFR08 | Data Isolation | FR01, FR02, FR04, FR05, FR08, FR10, FR11, FR19, FR22, FR30, FR31, FR32, FR33, FR34, FR35, FR36, FR37, FR38, FR39, FR40 |
+| NFR09 | Medical Data Privacy | FR05, FR07, FR09, FR10, FR12, FR13, FR14, FR15, FR16, FR26, FR27, FR28, FR29, FR32, FR35, FR36 |
+| NFR10 | Link Anonymity | FR26, FR27, FR39 |
+| NFR11 | Asset Protection | FR07, FR13, FR26 |
+| NFR12 | Link Integrity | FR26, FR27, FR28, FR29 |
+| NFR13 | Audit Logging | FR05, FR06, FR07, FR08, FR09, FR10, FR12, FR13, FR14, FR15, FR16, FR19, FR20, FR21, FR22, FR23, FR25, FR26, FR27, FR28, FR29, FR36, FR37, FR38, FR39, FR40 |
+| NFR14 | Notification Privacy | FR17, FR18, FR20, FR23, FR24 |
+| NFR15 | Backup & Disaster Recovery | FR03, FR10, FR13 |
+| NFR16 | Data Retention & GDPR Deletion | FR08, FR09, FR14 |
+| NFR17 | Global Search | FR05, FR11, FR19, FR22, FR30 |
+
+---
+
+## 7. FR → Test Case Mapping
+
+This table maps each Functional Requirement to its corresponding QA/Test Case IDs. Test Cases are derived directly from the Acceptance Criteria outlined in the PRD (where each atomic scenario forms the basis of a test case).
+
+| FR ID | FR Name | Associated Test Cases |
+| :--- | :--- | :--- |
+| FR01 | Local operator profile registration & offline access | TC-FR01-01 (Successful Local Registration), TC-FR01-02 (Incomplete Profile Rejected), TC-FR01-03 (Returning Operator Auto-Access) |
+| FR02 | Local shelter creation & multi-shelter management | TC-FR02-01 (Valid Local Shelter Creation), TC-FR02-02 (Duplicate Shelter Name Allowed), TC-FR02-03 (Edit Shelter Details), TC-FR02-04 (Multiple Shelters Created) |
+| FR03 | Local data export for portability | TC-FR03-01 (Single Shelter Export), TC-FR03-02 (All Shelters Export), TC-FR03-03 (Large Data Export Completion), TC-FR03-04 (Insufficient Storage Error) |
+| FR04 | Single-user shelter context switching | TC-FR04-01 (Switch Active Shelter), TC-FR04-02 (Data Scoping After Switch), TC-FR04-03 (Unsaved Changes Warning) |
+| FR05 | Pet profile creation and management | TC-FR05-01 (Create Profile), TC-FR05-02 (Edit Profile), TC-FR05-03 (Estimated DOB), TC-FR05-04 (Intake Origin Other) |
+| FR06 | Adoption availability flag toggle | TC-FR06-01 (Toggle On/Off), TC-FR06-02 (Auto-clear on Archival) |
+| FR07 | Pet media upload (photos/videos) | TC-FR07-01 (Valid Upload), TC-FR07-02 (Upload Failure/Abort) |
+| FR08 | Pet lifecycle outcomes (Adopted, Deceased, Transferred, In Foster) | TC-FR08-01 (Status Change), TC-FR08-02 (Pending Events Cancellation) |
+| FR09 | Adopter details capture on adoption | TC-FR09-01 (Submit Valid Form), TC-FR09-02 (Submit Incomplete Form) |
+| FR10 | Shadow record creation for internal transfers | TC-FR10-01 (Valid Internal Transfer), TC-FR10-02 (Transfer to Closed Shelter), TC-FR10-03 (Link Revocation on Transfer) |
+| FR11 | Veterinary clinic and professional directory | TC-FR11-01 (Add Vet), TC-FR11-02 (Duplicate Vet Warning) |
+| FR12 | Veterinary appointment logging | TC-FR12-01 (Log Upcoming), TC-FR12-02 (Log Retroactive) |
+| FR13 | Veterinary document upload and storage | TC-FR13-01 (Valid Upload), TC-FR13-02 (Upload Failure) |
+| FR14 | Appointment soft delete with reference preservation | TC-FR14-01 (Soft Delete Independent), TC-FR14-02 (Soft Delete Linked) |
+| FR15 | Pet care event recording | TC-FR15-01 (Create Future Event), TC-FR15-02 (Create <7 days Event) |
+| FR16 | Care event and appointment optional linking | TC-FR16-01 (Link Creation), TC-FR16-02 (Link Display) |
+| FR17 | Care event due-date in-app notification | TC-FR17-01 (Due Date Trigger) |
+| FR18 | Proactive care event reminders (7, 3, 1 day before) | TC-FR18-01 (Standard Trigger), TC-FR18-02 (Short Lead Time Trigger) |
+| FR19 | Categorized inventory management | TC-FR19-01 (Add Item), TC-FR19-02 (Edit Item), TC-FR19-03 (Concurrent Edit Conflict) |
+| FR20 | Per-item inventory alert rules (quantity threshold, expiration window) | TC-FR20-01 (Set Rules), TC-FR20-02 (Trigger Alert) |
+| FR21 | Inventory usage templates (1-click decrement from care events) | TC-FR21-01 (Execute Template), TC-FR21-02 (Concurrent Decrement) |
+| FR22 | Maintenance task creation, scheduling, and assignment | TC-FR22-01 (Create Task), TC-FR22-02 (Assign Task) |
+| FR23 | Maintenance task notifications and completion tracking | TC-FR23-01 (Complete Task), TC-FR23-02 (Overdue Alert) |
+| FR24 | Two-tier notification delivery (Standard in-app + Custom email/push) | TC-FR24-01 (In-App Delivery), TC-FR24-02 (Email/Push Delivery) |
+| FR25 | Notification delivery status tracking and failure escalation | TC-FR25-01 (Track Delivery), TC-FR25-02 (3-Retry Failure Escalation) |
+| FR26 | Shareable pet profile link generation (Adoption or Veterinary type) | TC-FR26-01 (Generate Vet Link), TC-FR26-02 (Generate Adopt Link) |
+| FR27 | Configurable link TTL (max 90 days, renewable, no permanent option) | TC-FR27-01 (Set TTL), TC-FR27-02 (Renew Link), TC-FR27-03 (Access Expired) |
+| FR28 | Link generation restrictions | TC-FR28-01 (Generate for Active), TC-FR28-02 (Block for Archived) |
+| FR29 | Manual link revocation | TC-FR29-01 (Revoke Link), TC-FR29-02 (Access Revoked) |
+| FR30 | Search and filtering across pets, inventory, maintenance | TC-FR30-01 (Valid Search), TC-FR30-02 (Empty Search) |
+| FR31 | Per-shelter dashboard overview | TC-FR31-01 (View Dashboard), TC-FR31-02 (Auto-refresh Stale Data) |
+| FR32 | Pet reports (census, archived log, treatment list) | TC-FR32-01 (Generate Report), TC-FR32-02 (Export Large Dataset) |
+| FR33 | Inventory reports (status, alert history) | TC-FR33-01 (Generate Report), TC-FR33-02 (Export Large Dataset) |
+| FR34 | Maintenance reports (scheduled, completed, overdue) | TC-FR34-01 (Generate Report), TC-FR34-02 (Export Large Dataset) |
+| FR35 | Staff and care event reports | TC-FR35-01 (Generate Report), TC-FR35-02 (Export Large Dataset) |
+| FR36 | Shareable link activity log | TC-FR36-01 (View Log), TC-FR36-02 (Filter Log) |
+| FR37 | User registration and authentication via Google SSO | TC-FR37-01 (New User SSO), TC-FR37-02 (Returning User SSO) |
+| FR38 | Shelter admin role assignment on creation | TC-FR38-01 (Admin Role on Shelter Creation) |
+| FR39 | Staff invite link generation and redemption | TC-FR39-01 (Generate Invite Link), TC-FR39-02 (Redeem Invite Link), TC-FR39-03 (Resend Invalidates Previous) |
+| FR40 | Role-based access control (Admin, Staff, Read-only) | TC-FR40-01 (Role Enforcement - Write), TC-FR40-02 (Role Enforcement - Admin) |
+

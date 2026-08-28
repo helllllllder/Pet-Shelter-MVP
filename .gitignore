@@ -1,0 +1,19 @@
+# Agent configuration and skills (local development only)
+.agents/
+.claude/
+AGENTS.md
+skills-lock.json
+
+# Node modules (if code is added later)
+node_modules/
+dist/
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
