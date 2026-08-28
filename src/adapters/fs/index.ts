@@ -1,0 +1,1 @@
+// File system storage adapter barrel\nexport {};\n
