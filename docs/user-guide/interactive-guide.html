@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pet Shelter Management App — Interactive User & Operator Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-elevated: #334155;
+      --border: rgba(255, 255, 255, 0.1);
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+      --text-muted: #64748b;
+      --accent-terracotta: #f97316;
+      --accent-teal: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-display: 'Playfair Display', Georgia, serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 280px;
+      background-color: #0b1120;
+      border-right: 1px solid var(--border);
+      padding: 2rem 1.25rem;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-amber));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    .brand-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #fff;
+    }
+
+    .brand-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+
+    .nav-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .nav-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      padding-left: 0.5rem;
+    }
+
+    .nav-links {
+      list-style: none;
+    }
+
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: all 0.15s ease;
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      color: #fff;
+      background-color: var(--surface);
+    }
+
+    .nav-links a.active {
+      border-left: 3px solid var(--accent-terracotta);
+      background-color: rgba(249, 115, 22, 0.1);
+      color: var(--accent-terracotta);
+    }
+
+    /* Main Content */
+    .content {
+      flex: 1;
+      padding: 3rem 4rem;
+      max-width: 1100px;
+      overflow-y: auto;
+    }
+
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(6, 182, 212, 0.1));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      background: rgba(249, 115, 22, 0.2);
+      color: var(--accent-terracotta);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+
+    .hero-desc {
+      font-size: 1.1rem;
+      color: var(--text-dim);
+      max-width: 720px;
+    }
+
+    .section {
+      margin-bottom: 3.5rem;
+      scroll-margin-top: 2rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.75rem;
+    }
+
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      background-color: var(--surface-elevated);
+      color: var(--accent-teal);
+    }
+
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin: 1.5rem 0;
+    }
+
+    .card {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .card-icon {
+      font-size: 1.25rem;
+    }
+
+    .card-body {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+
+    .code-block {
+      background-color: #0b1120;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #38bdf8;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+
+    .callout {
+      border-left: 4px solid var(--accent-terracotta);
+      background-color: rgba(249, 115, 22, 0.08);
+      padding: 1.25rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1.5rem 0;
+    }
+
+    .callout-title {
+      font-weight: 600;
+      color: var(--accent-terracotta);
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .step-list {
+      list-style: none;
+      counter-reset: step-counter;
+      margin: 1.5rem 0;
+    }
+
+    .step-item {
+      position: relative;
+      padding-left: 3rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .step-item::before {
+      counter-increment: step-counter;
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      background: var(--surface-elevated);
+      border: 1px solid var(--accent-teal);
+      color: var(--accent-teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .step-heading {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #fff;
+      margin-bottom: 0.25rem;
+    }
+
+    .step-desc {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background-color: var(--surface);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    tr:hover td {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    .badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .badge-green { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); }
+    .badge-orange { background: rgba(249, 115, 22, 0.15); color: var(--accent-terracotta); }
+    .badge-blue { background: rgba(6, 182, 212, 0.15); color: var(--accent-teal); }
+    .badge-red { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Sidebar -->
+  <nav class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">🐾</div>
+      <div>
+        <div class="brand-title">Pet Shelter App</div>
+        <div class="brand-subtitle">Operator Manual v2.0</div>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Phase 1: Core Operations</div>
+      <ul class="nav-links">
+        <li><a href="#operator" class="active">1. Operator Registration</a></li>
+        <li><a href="#shelter">2. Multi-Shelter Context</a></li>
+        <li><a href="#pets">3. Pet Lifecycle & Intake</a></li>
+        <li><a href="#adoptions">4. Adoptions & Outcomes</a></li>
+        <li><a href="#veterinary">5. Vet Directory & Records</a></li>
+        <li><a href="#care">6. Care Events Engine</a></li>
+      </ul>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Phase 2: Facilities & Logistics</div>
+      <ul class="nav-links">
+        <li><a href="#inventory">7. Inventory Management</a></li>
+        <li><a href="#alerts">8. Alert Rules Engine</a></li>
+        <li><a href="#templates">9. 1-Click Usage Templates</a></li>
+        <li><a href="#maintenance">10. Maintenance Tasks</a></li>
+        <li><a href="#notifications">11. Notification Escalation</a></li>
+        <li><a href="#privacy">12. GDPR & Data Export</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="content">
+
+    <div class="hero-banner">
+      <span class="hero-badge">100% OFFLINE-FIRST MVP</span>
+      <h1 class="hero-title">Pet Shelter App User Guide</h1>
+      <p class="hero-desc">
+        Complete operator reference and walkthrough for managing animals, medical care, categorized inventory, facility maintenance, and communications with zero cloud dependency.
+      </p>
+    </div>
+
+    <!-- Section 1 -->
+    <section id="operator" class="section">
+      <div class="section-header">
+        <span class="section-tag">FR01 / TC-FR01</span>
+        <h2 class="section-title">1. Local Operator Profile & Authentication</h2>
+      </div>
+      <p>The app operates in a zero-network environment. Your operator profile binds locally to your device installation.</p>
+      
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Initial Setup</span>
+            <span class="card-icon">👤</span>
+          </div>
+          <div class="card-body">
+            On first launch, submit your Full Name and Email. The app issues a local UUIDv7 identifier and stores it in secure device storage.
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Returning Auto-Login</span>
+            <span class="card-icon">⚡</span>
+          </div>
+          <div class="card-body">
+            Subsequent application opens automatically recognize your local device profile, bypassing login prompts.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2 -->
+    <section id="shelter" class="section">
+      <div class="section-header">
+        <span class="section-tag">FR02, FR04 / NFR08</span>
+        <h2 class="section-title">2. Multi-Shelter Management & Context Isolation</h2>
+      </div>
+      <p>Manage distinct rescue organizations or shelter branches from a single device without data leakage.</p>
+
+      <ul class="step-list">
+        <li class="step-item">
+          <div class="step-heading">Create Facilities</div>
+          <div class="step-desc">Add one or more shelters. Shelters are allowed to have duplicate names without namespace collisions.</div>
+        </li>
+        <li class="step-item">
+          <div class="step-heading">Switch Context Instantly</div>
+          <div class="step-desc">Switch between facilities via the top dropdown. All active queries, caches, and repository bindings immediately re-scope to the chosen shelter.</div>
+        </li>
+        <li class="step-item">
+          <div class="step-heading">Dirty State Protection</div>
+          <div class="step-desc">If you switch shelters while editing an animal profile or care record, a modal warns you to save or discard changes before leaving.</div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Section 3 -->
+    <section id="pets" class="section">
+      <div class="section-header">
+        <span class="section-tag">FR05–FR09</span>
+        <h2 class="section-title">3. Pet Profiles & Animal Intake</h2>
+      </div>
+      <p>Record comprehensive demographic, medical, and intake records for every animal.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Species</strong></td>
+            <td><span class="badge badge-blue">CANINE | FELINE | AVIAN | ...</span></td>
+            <td>5 core species categories + OTHER</td>
+          </tr>
+          <tr>
+            <td><strong>Date of Birth</strong></td>
+            <td><span class="badge badge-green">ISO Date + Estimated Flag</span></td>
+            <td>Marks <code>is_dob_estimated = true</code> when age is estimated</td>
+          </tr>
+          <tr>
+            <td><strong>Intake Origin</strong></td>
+            <td><span class="badge badge-orange">STRAY | SURRENDER | RESCUE</span></td>
+            <td>Tracks intake origin and source shelter references</td>
+          </tr>
+          <tr>
+            <td><strong>Health Status</strong></td>
+            <td><span class="badge badge-green">HEALTHY | SICK | INJURED</span></td>
+            <td>Supports multi-condition tagging</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Section 7 -->
+    <section id="inventory" class="section">
+      <div class="section-header">
+        <span class="section-tag">FR19 / TC-FR19</span>
+        <h2 class="section-title">7. Categorized Inventory Management</h2>
+      </div>
+      <p>Keep track of food, pharmaceuticals, and shelter supplies with precision units of measure.</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🥫 Food</span>
+          </div>
+          <div class="card-body">Kibble, wet food, puppy formula, veterinary diets (measured in KG, G, UNITS).</div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">💊 Medication</span>
+          </div>
+          <div class="card-body">Antibiotics, vaccines, pain relievers, dewormers (measured in ML, DOSES, UNITS).</div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🧼 Cleaning</span>
+          </div>
+          <div class="card-body">Disinfectants, bleach, kennel wash, detergent (measured in L, ML, UNITS).</div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🩺 Equipment</span>
+          </div>
+          <div class="card-body">Syringes, bandages, microchip scanners, gloves (measured in UNITS, BOXES).</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 8 & 9 -->
+    <section id="templates" class="section">
+      <div class="section-header">
+        <span class="section-tag">FR20, FR21 / ADR-0004</span>
+        <h2 class="section-title">8. 1-Click Usage Templates & Alert Rules</h2>
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">⚡ 1-Click Care Event Stock Decrement</div>
+        <p>Bundle supplies into templates (e.g. <em>"Standard Puppy Vaccine Pack"</em> = 1 Vaccine Vial + 1 Syringe). When administering care, selecting the template atomically decrements all linked stock in SQLite.</p>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Low-Stock Alert Rule</span>
+            <span class="card-icon">📉</span>
+          </div>
+          <div class="card-body">
+            Triggers immediately when current stock drops below your configured threshold (e.g. &le; 10 units).
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Expiration Proximity Rule</span>
+            <span class="card-icon">⏳</span>
+          </div>
+          <div class="card-body">
+            Triggers a warning banner when items are within $N$ days of expiring (e.g. within 30 days).
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 10 & 11 -->
+    <section id="notifications" class="section">
+      <div class="section-header">
+        <span class="section-tag">FR24, FR25 / ADR-0004</span>
+        <h2 class="section-title">9. Notifications & Retry Escalation Policy</h2>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Tier</th>
+            <th>Channel</th>
+            <th>Delivery Behavior</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Standard Tier</strong></td>
+            <td>In-App Banner</td>
+            <td>Instant delivery (<5s) for care due dates, inventory alerts, and overdue tasks.</td>
+          </tr>
+          <tr>
+            <td><strong>Custom Tier</strong></td>
+            <td>Email / SMS / Push</td>
+            <td>Queued with a <strong>3-Retry Policy</strong>. If delivery fails 3 times, escalates to a prominent high-visibility in-app banner with dismiss action.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+</body>
+</html>
