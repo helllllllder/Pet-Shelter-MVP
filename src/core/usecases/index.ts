@@ -18,3 +18,4 @@ export * from './inventory/apply-usage-template';
 export * from './maintenance/create-maintenance-task';
 export * from './maintenance/complete-maintenance-task';
 export * from './maintenance/list-overdue-tasks';
+export * from './notifications/dispatch-notification';

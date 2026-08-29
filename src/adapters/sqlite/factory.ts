@@ -8,6 +8,7 @@ import {
   IAuditLogRepository,
   IInventoryRepository,
   IMaintenanceRepository,
+  INotificationRepository,
 } from '@core/contracts';
 import { DrizzlePetRepository } from './pet-repository';
 import { DrizzleOperatorRepository } from './operator-repository';
@@ -17,6 +18,7 @@ import { DrizzleCareEventRepository } from './care-event-repository';
 import { DrizzleAuditLogRepository } from './audit-log-repository';
 import { DrizzleInventoryRepository } from './inventory-repository';
 import { DrizzleMaintenanceRepository } from './maintenance-repository';
+import { DrizzleNotificationRepository } from './notification-repository';
 
 export class ScopedRepositoryFactory {
   constructor(private readonly db: any) {}
@@ -61,5 +63,9 @@ export class ScopedRepositoryFactory {
 
   getMaintenanceRepository(session: IShelterSession): IMaintenanceRepository {
     return new DrizzleMaintenanceRepository(session, this.db);
+  }
+
+  getNotificationRepository(session: IShelterSession): INotificationRepository {
+    return new DrizzleNotificationRepository(session, this.db);
   }
 }
