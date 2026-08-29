@@ -8,3 +8,5 @@ export * from './pet/set-pet-outcome';
 export * from './vet/log-appointment';
 export * from './care/schedule-care-event';
 export * from './audit/execute-gdpr-erasure';
+export * from './inventory/create-inventory-item';
+export * from './inventory/adjust-inventory-quantity';
