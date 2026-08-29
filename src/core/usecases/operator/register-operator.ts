@@ -35,6 +35,13 @@ export class RegisterOperatorUseCase {
 
     const validated = OperatorProfileSchema.parse(candidate);
 
-    return this.operatorRepo.createProfile(validated);
+    return this.operatorRepo.createProfile({
+      id: validated.id,
+      fullName: validated.fullName,
+      email: validated.email,
+      phone: validated.phone ?? null,
+      lastActiveShelterId: validated.lastActiveShelterId ?? null,
+      deviceInstallId: validated.deviceInstallId,
+    });
   }
 }

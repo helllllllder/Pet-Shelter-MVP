@@ -24,14 +24,14 @@ export class DrizzleAuditLogRepository implements IAuditLogRepository {
       .select()
       .from(auditLogs)
       .where(and(eq(auditLogs.entityType, entityType), eq(auditLogs.entityId, entityId)))
-      .orderBy(desc(auditLogs.createdAt))
+      .orderBy(desc(auditLogs.createdAt), desc(auditLogs.id))
       .all();
 
     return rows;
   }
 
   async listAll(): Promise<AuditLogModel[]> {
-    return this.db.select().from(auditLogs).orderBy(desc(auditLogs.createdAt)).all();
+    return this.db.select().from(auditLogs).orderBy(desc(auditLogs.createdAt), desc(auditLogs.id)).all();
   }
 
   async tombstoneActor(actorIdentifier: string): Promise<number> {

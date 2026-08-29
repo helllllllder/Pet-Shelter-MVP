@@ -35,7 +35,14 @@ export class CreateShelterUseCase {
 
     const validated = ShelterSchema.parse(candidate);
 
-    const created = await this.shelterRepo.create(validated);
+    const created = await this.shelterRepo.create({
+      name: validated.name,
+      description: validated.description ?? null,
+      address: validated.address ?? null,
+      phone: validated.phone ?? null,
+      email: validated.email ?? null,
+      isActive: validated.isActive,
+    });
 
     // Auto-select rule: If operator profile has no active shelter, auto-set this one (TC-FR02-01)
     const profile = await this.operatorRepo.getProfile();

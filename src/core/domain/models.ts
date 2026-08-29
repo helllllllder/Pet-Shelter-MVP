@@ -7,18 +7,15 @@ import {
   CareModality,
   RecurrenceUnit,
   CareOccurrenceStatus,
-  DocumentMimeType,
-  AuditAction,
+  InventoryCategory,
+  UnitOfMeasure,
+  InventoryAlertTriggerType,
+  MaintenanceTaskType,
+  MaintenanceStatus,
+  NotificationChannel,
+  NotificationDeliveryStatus,
+  NotificationTier,
 } from './enums';
-
-export interface PetMediaReference {
-  id: string; // UUIDv7
-  type: 'PHOTO' | 'VIDEO';
-  localUri: string;
-  fileName: string;
-  fileSizeBytes: number;
-  uploadedAt: string;
-}
 
 export interface OperatorProfileModel {
   id: string; // UUIDv7
@@ -27,8 +24,8 @@ export interface OperatorProfileModel {
   phone: string | null;
   lastActiveShelterId: string | null;
   deviceInstallId: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string; // ISO-8601 UTC
+  updatedAt: string; // ISO-8601 UTC
 }
 
 export interface ShelterModel {
@@ -39,13 +36,22 @@ export interface ShelterModel {
   phone: string | null;
   email: string | null;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string; // ISO-8601 UTC
+  updatedAt: string; // ISO-8601 UTC
+}
+
+export interface PetMediaReference {
+  id: string;
+  localUri: string;
+  mimeType: string;
+  fileSizeBytes: number;
+  isPrimary: boolean;
+  uploadedAt: string;
 }
 
 export interface PetModel {
   id: string; // UUIDv7
-  shelterId: string;
+  shelterId: string; // UUIDv7
   name: string;
   species: Species;
   breed: string;
@@ -56,19 +62,19 @@ export interface PetModel {
   intakeOrigin: IntakeOrigin;
   intakeOriginDetails: string | null;
   healthStatus: HealthStatus;
-  healthConditions: string[];
+  healthConditions: string[]; // JSON array
   isAvailableForAdoption: boolean;
   outcomeStatus: PetOutcomeStatus;
   outcomeDate: string | null;
   outcomeNotes: string | null;
-  mediaReferences: PetMediaReference[];
+  mediaReferences: PetMediaReference[]; // JSON array
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
 }
 
 export interface AdopterDetailModel {
-  id: string; // UUIDv7
+  id: string;
   shelterId: string;
   petId: string;
   adopterName: string;
@@ -80,24 +86,13 @@ export interface AdopterDetailModel {
   updatedAt: string;
 }
 
-export interface ShadowRecordModel {
-  id: string; // UUIDv7
-  originShelterId: string;
-  destinationShelterId: string;
-  originPetId: string;
-  destinationPetId: string;
-  transferredAt: string;
-  snapshotPayloadJson: string;
-  createdAt: string;
-}
-
 export interface VetClinicModel {
-  id: string; // UUIDv7
+  id: string;
   shelterId: string;
   name: string;
-  phone: string;
+  phone: string | null;
   email: string | null;
-  address: string;
+  address: string | null;
   emergencyServices: boolean;
   notes: string | null;
   createdAt: string;
@@ -106,26 +101,26 @@ export interface VetClinicModel {
 }
 
 export interface VeterinarianModel {
-  id: string; // UUIDv7
+  id: string;
   shelterId: string;
   clinicId: string;
-  name: string;
+  fullName: string;
   licenseNumber: string | null;
   phone: string | null;
   email: string | null;
-  specialty: string | null;
+  specialization: string | null;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
 }
 
 export interface VetAppointmentModel {
-  id: string; // UUIDv7
+  id: string;
   shelterId: string;
   petId: string;
   clinicId: string;
   veterinarianId: string | null;
-  appointmentDate: string;
+  appointmentDate: string; // ISO-8601 UTC
   reason: string;
   diagnosis: string | null;
   prognosis: string | null;
@@ -136,20 +131,19 @@ export interface VetAppointmentModel {
 }
 
 export interface VetDocumentModel {
-  id: string; // UUIDv7
+  id: string;
   shelterId: string;
   appointmentId: string;
   fileName: string;
-  fileType: DocumentMimeType;
+  fileType: string;
   fileSizeBytes: number;
   localRelativePath: string;
   sha256Checksum: string;
   uploadedAt: string;
-  createdAt: string;
 }
 
 export interface CareEventModel {
-  id: string; // UUIDv7
+  id: string;
   shelterId: string;
   petId: string;
   linkedAppointmentId: string | null;
@@ -159,19 +153,19 @@ export interface CareEventModel {
   administrationInstructions: string | null;
   recurrenceIntervalUnit: RecurrenceUnit;
   recurrenceIntervalValue: number;
-  startDate: string;
-  endDate: string | null;
-  status: 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+  startDate: string; // YYYY-MM-DD
+  endDate: string | null; // YYYY-MM-DD
+  status: 'ACTIVE' | 'CANCELLED';
   createdAt: string;
   updatedAt: string;
 }
 
 export interface CareEventOccurrenceModel {
-  id: string; // UUIDv7
+  id: string;
   shelterId: string;
   careEventId: string;
   petId: string;
-  dueDate: string;
+  dueDate: string; // ISO-8601 UTC
   status: CareOccurrenceStatus;
   administeredAt: string | null;
   administeredByOperatorName: string | null;
@@ -181,14 +175,105 @@ export interface CareEventOccurrenceModel {
 }
 
 export interface AuditLogModel {
-  id: string; // UUIDv7
+  id: string;
   shelterId: string | null;
-  entityType: 'OPERATOR' | 'SHELTER' | 'PET' | 'APPOINTMENT' | 'CARE_EVENT' | 'EXPORT' | 'ADOPTION';
+  entityType: string;
   entityId: string;
-  action: AuditAction;
+  action: string;
   actorName: string;
   actorContact: string | null;
   payloadDiffJson: string | null;
   ipOrDeviceId: string;
   createdAt: string;
+}
+
+// Phase 2 Models
+export interface InventoryItemModel {
+  id: string;
+  shelterId: string;
+  name: string;
+  category: InventoryCategory;
+  quantity: number;
+  unitOfMeasure: UnitOfMeasure;
+  purchaseDate: string | null;
+  expirationDate: string | null;
+  description: string | null;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+export interface InventoryAlertRuleModel {
+  id: string;
+  shelterId: string;
+  inventoryItemId: string;
+  triggerType: InventoryAlertTriggerType;
+  thresholdValue: number | null;
+  daysBeforeExpiration: number | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InventoryUsageTemplateModel {
+  id: string;
+  shelterId: string;
+  name: string;
+  description: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InventoryUsageTemplateItemModel {
+  id: string;
+  templateId: string;
+  inventoryItemId: string;
+  quantityToDecrement: number;
+  createdAt: string;
+}
+
+export interface MaintenanceTaskModel {
+  id: string;
+  shelterId: string;
+  taskType: MaintenanceTaskType;
+  description: string;
+  scheduledDate: string; // ISO-8601 UTC
+  recurrenceIntervalUnit: RecurrenceUnit;
+  recurrenceIntervalValue: number;
+  assignedToName: string | null;
+  status: MaintenanceStatus;
+  completedAt: string | null;
+  completedByOperatorName: string | null;
+  completionNotes: string | null;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+export interface NotificationModel {
+  id: string;
+  shelterId: string;
+  tier: NotificationTier;
+  channel: NotificationChannel;
+  recipientIdentifier: string;
+  title: string;
+  message: string;
+  entityType: string | null;
+  entityId: string | null;
+  status: NotificationDeliveryStatus;
+  retryCount: number;
+  maxRetries: number;
+  lastAttemptedAt: string | null;
+  deliveredAt: string | null;
+  createdAt: string;
+}
+
+export interface NotificationEscalationModel {
+  id: string;
+  notificationId: string;
+  shelterId: string;
+  failureReason: string;
+  isDismissed: boolean;
+  createdAt: string;
+  dismissedAt: string | null;
 }
