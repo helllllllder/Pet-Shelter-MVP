@@ -9,4 +9,5 @@ export * from './care-event-repository';
 export * from './audit-log-repository';
 export * from './inventory-repository';
 export * from './maintenance-repository';
+export * from './notification-repository';
 export * from './factory';
