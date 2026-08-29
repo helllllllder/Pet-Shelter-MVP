@@ -2,22 +2,22 @@ import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import * as schema from './schema';
 
-export const SQL_DDL = `
+export const SQLITE_DDL_SCHEMA = `
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS operator_profile (
-    id TEXT PRIMARY KEY NOT NULL,
+    id TEXT PRIMARY KEY,
     full_name TEXT NOT NULL,
     email TEXT NOT NULL,
     phone TEXT,
     last_active_shelter_id TEXT,
-    device_install_id TEXT NOT NULL UNIQUE,
+    device_install_id TEXT NOT NULL,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS shelters (
-    id TEXT PRIMARY KEY NOT NULL,
+    id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT,
     address TEXT,
@@ -27,11 +27,10 @@ CREATE TABLE IF NOT EXISTS shelters (
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
 );
-CREATE INDEX IF NOT EXISTS idx_shelters_active ON shelters(is_active);
 
 CREATE TABLE IF NOT EXISTS pets (
-    id TEXT PRIMARY KEY NOT NULL,
-    shelter_id TEXT NOT NULL,
+    id TEXT PRIMARY KEY,
+    shelter_id TEXT NOT NULL REFERENCES shelters(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     species TEXT NOT NULL,
     breed TEXT NOT NULL,
@@ -42,93 +41,74 @@ CREATE TABLE IF NOT EXISTS pets (
     intake_origin TEXT NOT NULL,
     intake_origin_details TEXT,
     health_status TEXT NOT NULL DEFAULT 'HEALTHY',
-    health_conditions TEXT,
+    health_conditions TEXT NOT NULL DEFAULT '[]',
     is_available_for_adoption INTEGER NOT NULL DEFAULT 0,
     outcome_status TEXT NOT NULL DEFAULT 'ACTIVE',
     outcome_date TEXT,
     outcome_notes TEXT,
-    media_references TEXT,
+    media_references TEXT NOT NULL DEFAULT '[]',
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
-    deleted_at TEXT,
-    FOREIGN KEY (shelter_id) REFERENCES shelters(id) ON DELETE CASCADE
+    deleted_at TEXT
 );
-CREATE INDEX IF NOT EXISTS idx_pets_shelter_outcome ON pets(shelter_id, outcome_status, deleted_at);
-CREATE INDEX IF NOT EXISTS idx_pets_shelter_species ON pets(shelter_id, species);
-CREATE INDEX IF NOT EXISTS idx_pets_search ON pets(shelter_id, name COLLATE NOCASE);
 
 CREATE TABLE IF NOT EXISTS adopter_details (
-    id TEXT PRIMARY KEY NOT NULL,
-    shelter_id TEXT NOT NULL,
-    pet_id TEXT NOT NULL UNIQUE,
+    id TEXT PRIMARY KEY,
+    shelter_id TEXT NOT NULL REFERENCES shelters(id) ON DELETE CASCADE,
+    pet_id TEXT NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
     adopter_name TEXT NOT NULL,
     adopter_phone TEXT NOT NULL,
     adopter_address TEXT NOT NULL,
     adopted_at TEXT NOT NULL,
     notes TEXT,
     created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL,
-    FOREIGN KEY (shelter_id) REFERENCES shelters(id) ON DELETE CASCADE,
-    FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE CASCADE
+    updated_at TEXT NOT NULL
 );
-CREATE INDEX IF NOT EXISTS idx_adopter_shelter ON adopter_details(shelter_id);
 
 CREATE TABLE IF NOT EXISTS shadow_records (
-    id TEXT PRIMARY KEY NOT NULL,
-    origin_shelter_id TEXT NOT NULL,
-    destination_shelter_id TEXT NOT NULL,
-    origin_pet_id TEXT NOT NULL,
-    destination_pet_id TEXT NOT NULL,
-    transferred_at TEXT NOT NULL,
-    snapshot_payload_json TEXT NOT NULL,
-    created_at TEXT NOT NULL,
-    FOREIGN KEY (origin_shelter_id) REFERENCES shelters(id) ON DELETE RESTRICT,
-    FOREIGN KEY (destination_shelter_id) REFERENCES shelters(id) ON DELETE RESTRICT,
-    FOREIGN KEY (origin_pet_id) REFERENCES pets(id) ON DELETE RESTRICT,
-    FOREIGN KEY (destination_pet_id) REFERENCES pets(id) ON DELETE RESTRICT
+    id TEXT PRIMARY KEY,
+    original_shelter_id TEXT NOT NULL REFERENCES shelters(id) ON DELETE CASCADE,
+    target_shelter_id TEXT NOT NULL REFERENCES shelters(id) ON DELETE CASCADE,
+    original_pet_id TEXT NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
+    new_pet_id TEXT NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
+    snapshot_data_json TEXT NOT NULL,
+    transferred_at TEXT NOT NULL
 );
-CREATE INDEX IF NOT EXISTS idx_shadow_origin ON shadow_records(origin_shelter_id, origin_pet_id);
-CREATE INDEX IF NOT EXISTS idx_shadow_dest ON shadow_records(destination_shelter_id, destination_pet_id);
 
 CREATE TABLE IF NOT EXISTS vet_clinics (
-    id TEXT PRIMARY KEY NOT NULL,
-    shelter_id TEXT NOT NULL,
+    id TEXT PRIMARY KEY,
+    shelter_id TEXT NOT NULL REFERENCES shelters(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
-    phone TEXT NOT NULL,
+    phone TEXT,
     email TEXT,
-    address TEXT NOT NULL,
+    address TEXT,
     emergency_services INTEGER NOT NULL DEFAULT 0,
     notes TEXT,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
-    deleted_at TEXT,
-    FOREIGN KEY (shelter_id) REFERENCES shelters(id) ON DELETE CASCADE
+    deleted_at TEXT
 );
-CREATE INDEX IF NOT EXISTS idx_vet_clinics_shelter ON vet_clinics(shelter_id, name COLLATE NOCASE);
 
 CREATE TABLE IF NOT EXISTS veterinarians (
-    id TEXT PRIMARY KEY NOT NULL,
-    shelter_id TEXT NOT NULL,
-    clinic_id TEXT NOT NULL,
-    name TEXT NOT NULL,
+    id TEXT PRIMARY KEY,
+    shelter_id TEXT NOT NULL REFERENCES shelters(id) ON DELETE CASCADE,
+    clinic_id TEXT NOT NULL REFERENCES vet_clinics(id) ON DELETE CASCADE,
+    full_name TEXT NOT NULL,
     license_number TEXT,
     phone TEXT,
     email TEXT,
-    specialty TEXT,
+    specialization TEXT,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
-    deleted_at TEXT,
-    FOREIGN KEY (shelter_id) REFERENCES shelters(id) ON DELETE CASCADE,
-    FOREIGN KEY (clinic_id) REFERENCES vet_clinics(id) ON DELETE CASCADE
+    deleted_at TEXT
 );
-CREATE INDEX IF NOT EXISTS idx_vets_shelter_clinic ON veterinarians(shelter_id, clinic_id);
 
 CREATE TABLE IF NOT EXISTS vet_appointments (
-    id TEXT PRIMARY KEY NOT NULL,
-    shelter_id TEXT NOT NULL,
-    pet_id TEXT NOT NULL,
-    clinic_id TEXT NOT NULL,
-    veterinarian_id TEXT,
+    id TEXT PRIMARY KEY,
+    shelter_id TEXT NOT NULL REFERENCES shelters(id) ON DELETE CASCADE,
+    pet_id TEXT NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
+    clinic_id TEXT NOT NULL REFERENCES vet_clinics(id) ON DELETE CASCADE,
+    veterinarian_id TEXT REFERENCES veterinarians(id) ON DELETE SET NULL,
     appointment_date TEXT NOT NULL,
     reason TEXT NOT NULL,
     diagnosis TEXT,
@@ -136,75 +116,56 @@ CREATE TABLE IF NOT EXISTS vet_appointments (
     is_retroactive INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
-    deleted_at TEXT,
-    FOREIGN KEY (shelter_id) REFERENCES shelters(id) ON DELETE CASCADE,
-    FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE CASCADE,
-    FOREIGN KEY (clinic_id) REFERENCES vet_clinics(id) ON DELETE RESTRICT,
-    FOREIGN KEY (veterinarian_id) REFERENCES veterinarians(id) ON DELETE SET NULL
+    deleted_at TEXT
 );
-CREATE INDEX IF NOT EXISTS idx_appointments_pet ON vet_appointments(shelter_id, pet_id, appointment_date DESC);
-CREATE INDEX IF NOT EXISTS idx_appointments_date ON vet_appointments(shelter_id, appointment_date);
 
 CREATE TABLE IF NOT EXISTS vet_documents (
-    id TEXT PRIMARY KEY NOT NULL,
-    shelter_id TEXT NOT NULL,
-    appointment_id TEXT NOT NULL,
+    id TEXT PRIMARY KEY,
+    shelter_id TEXT NOT NULL REFERENCES shelters(id) ON DELETE CASCADE,
+    appointment_id TEXT NOT NULL REFERENCES vet_appointments(id) ON DELETE CASCADE,
     file_name TEXT NOT NULL,
     file_type TEXT NOT NULL,
     file_size_bytes INTEGER NOT NULL,
     local_relative_path TEXT NOT NULL,
     sha256_checksum TEXT NOT NULL,
-    uploaded_at TEXT NOT NULL,
-    created_at TEXT NOT NULL,
-    FOREIGN KEY (shelter_id) REFERENCES shelters(id) ON DELETE CASCADE,
-    FOREIGN KEY (appointment_id) REFERENCES vet_appointments(id) ON DELETE CASCADE
+    uploaded_at TEXT NOT NULL
 );
-CREATE INDEX IF NOT EXISTS idx_vet_docs_appt ON vet_documents(shelter_id, appointment_id);
 
 CREATE TABLE IF NOT EXISTS care_events (
-    id TEXT PRIMARY KEY NOT NULL,
-    shelter_id TEXT NOT NULL,
-    pet_id TEXT NOT NULL,
-    linked_appointment_id TEXT,
+    id TEXT PRIMARY KEY,
+    shelter_id TEXT NOT NULL REFERENCES shelters(id) ON DELETE CASCADE,
+    pet_id TEXT NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
+    linked_appointment_id TEXT REFERENCES vet_appointments(id) ON DELETE SET NULL,
     modality TEXT NOT NULL,
     substance_name TEXT,
     dosage TEXT,
     administration_instructions TEXT,
-    recurrence_interval_unit TEXT,
-    recurrence_interval_value INTEGER DEFAULT 0,
+    recurrence_interval_unit TEXT NOT NULL DEFAULT 'NONE',
+    recurrence_interval_value INTEGER NOT NULL DEFAULT 0,
     start_date TEXT NOT NULL,
     end_date TEXT,
     status TEXT NOT NULL DEFAULT 'ACTIVE',
     created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL,
-    FOREIGN KEY (shelter_id) REFERENCES shelters(id) ON DELETE CASCADE,
-    FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE CASCADE,
-    FOREIGN KEY (linked_appointment_id) REFERENCES vet_appointments(id) ON DELETE SET NULL
+    updated_at TEXT NOT NULL
 );
-CREATE INDEX IF NOT EXISTS idx_care_events_pet ON care_events(shelter_id, pet_id, status);
 
 CREATE TABLE IF NOT EXISTS care_event_occurrences (
-    id TEXT PRIMARY KEY NOT NULL,
-    shelter_id TEXT NOT NULL,
-    care_event_id TEXT NOT NULL,
-    pet_id TEXT NOT NULL,
+    id TEXT PRIMARY KEY,
+    shelter_id TEXT NOT NULL REFERENCES shelters(id) ON DELETE CASCADE,
+    care_event_id TEXT NOT NULL REFERENCES care_events(id) ON DELETE CASCADE,
+    pet_id TEXT NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
     due_date TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'SCHEDULED',
     administered_at TEXT,
     administered_by_operator_name TEXT,
     notes TEXT,
     created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL,
-    FOREIGN KEY (shelter_id) REFERENCES shelters(id) ON DELETE CASCADE,
-    FOREIGN KEY (care_event_id) REFERENCES care_events(id) ON DELETE CASCADE,
-    FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE CASCADE
+    updated_at TEXT NOT NULL
 );
-CREATE INDEX IF NOT EXISTS idx_occurrences_due ON care_event_occurrences(shelter_id, status, due_date ASC);
-CREATE INDEX IF NOT EXISTS idx_occurrences_pet ON care_event_occurrences(shelter_id, pet_id, due_date);
 
 CREATE TABLE IF NOT EXISTS audit_logs (
-    id TEXT PRIMARY KEY NOT NULL,
-    shelter_id TEXT,
+    id TEXT PRIMARY KEY,
+    shelter_id TEXT REFERENCES shelters(id) ON DELETE CASCADE,
     entity_type TEXT NOT NULL,
     entity_id TEXT NOT NULL,
     action TEXT NOT NULL,
@@ -214,13 +175,113 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     ip_or_device_id TEXT NOT NULL,
     created_at TEXT NOT NULL
 );
-CREATE INDEX IF NOT EXISTS idx_audit_shelter_entity ON audit_logs(shelter_id, entity_type, entity_id);
-CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_logs(created_at DESC);
+
+-- Phase 2 Tables
+CREATE TABLE IF NOT EXISTS inventory_items (
+    id TEXT PRIMARY KEY,
+    shelter_id TEXT NOT NULL REFERENCES shelters(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    category TEXT NOT NULL,
+    quantity REAL NOT NULL DEFAULT 0,
+    unit_of_measure TEXT NOT NULL,
+    purchase_date TEXT,
+    expiration_date TEXT,
+    description TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    deleted_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS inventory_alert_rules (
+    id TEXT PRIMARY KEY,
+    shelter_id TEXT NOT NULL REFERENCES shelters(id) ON DELETE CASCADE,
+    inventory_item_id TEXT NOT NULL REFERENCES inventory_items(id) ON DELETE CASCADE,
+    trigger_type TEXT NOT NULL,
+    threshold_value REAL,
+    days_before_expiration INTEGER,
+    is_active INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS inventory_usage_templates (
+    id TEXT PRIMARY KEY,
+    shelter_id TEXT NOT NULL REFERENCES shelters(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    description TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS inventory_usage_template_items (
+    id TEXT PRIMARY KEY,
+    template_id TEXT NOT NULL REFERENCES inventory_usage_templates(id) ON DELETE CASCADE,
+    inventory_item_id TEXT NOT NULL REFERENCES inventory_items(id) ON DELETE CASCADE,
+    quantity_to_decrement REAL NOT NULL,
+    created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS maintenance_tasks (
+    id TEXT PRIMARY KEY,
+    shelter_id TEXT NOT NULL REFERENCES shelters(id) ON DELETE CASCADE,
+    task_type TEXT NOT NULL,
+    description TEXT NOT NULL,
+    scheduled_date TEXT NOT NULL,
+    recurrence_interval_unit TEXT NOT NULL DEFAULT 'NONE',
+    recurrence_interval_value INTEGER NOT NULL DEFAULT 0,
+    assigned_to_name TEXT,
+    status TEXT NOT NULL DEFAULT 'SCHEDULED',
+    completed_at TEXT,
+    completed_by_operator_name TEXT,
+    completion_notes TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    deleted_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS notifications (
+    id TEXT PRIMARY KEY,
+    shelter_id TEXT NOT NULL REFERENCES shelters(id) ON DELETE CASCADE,
+    tier TEXT NOT NULL DEFAULT 'STANDARD',
+    channel TEXT NOT NULL DEFAULT 'IN_APP',
+    recipient_identifier TEXT NOT NULL,
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    entity_type TEXT,
+    entity_id TEXT,
+    status TEXT NOT NULL DEFAULT 'PENDING',
+    retry_count INTEGER NOT NULL DEFAULT 0,
+    max_retries INTEGER NOT NULL DEFAULT 3,
+    last_attempted_at TEXT,
+    delivered_at TEXT,
+    created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS notification_escalation_logs (
+    id TEXT PRIMARY KEY,
+    notification_id TEXT NOT NULL REFERENCES notifications(id) ON DELETE CASCADE,
+    shelter_id TEXT NOT NULL REFERENCES shelters(id) ON DELETE CASCADE,
+    failure_reason TEXT NOT NULL,
+    is_dismissed INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL,
+    dismissed_at TEXT
+);
+
+-- Indexes for sub-300ms queries (NFR02)
+CREATE INDEX IF NOT EXISTS pets_shelter_id_idx ON pets(shelter_id);
+CREATE INDEX IF NOT EXISTS pets_outcome_status_idx ON pets(outcome_status);
+CREATE INDEX IF NOT EXISTS pets_name_idx ON pets(name);
+CREATE INDEX IF NOT EXISTS inventory_items_shelter_id_idx ON inventory_items(shelter_id);
+CREATE INDEX IF NOT EXISTS inventory_items_category_idx ON inventory_items(category);
+CREATE INDEX IF NOT EXISTS maintenance_tasks_shelter_id_idx ON maintenance_tasks(shelter_id);
+CREATE INDEX IF NOT EXISTS maintenance_tasks_status_idx ON maintenance_tasks(status);
+CREATE INDEX IF NOT EXISTS notifications_shelter_id_idx ON notifications(shelter_id);
+CREATE INDEX IF NOT EXISTS notifications_status_idx ON notifications(status);
 `;
 
 export function createTestDatabase(inMemory = true) {
-  const sqlite = new Database(inMemory ? ':memory:' : undefined);
-  sqlite.exec(SQL_DDL);
+  const sqlite = inMemory ? new Database(':memory:') : new Database('luna_pet_shelter.db');
+  sqlite.exec(SQLITE_DDL_SCHEMA);
   const db = drizzle(sqlite, { schema });
   return { db, sqlite };
 }

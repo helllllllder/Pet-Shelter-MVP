@@ -1,12 +1,15 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createTestDatabase, ScopedRepositoryFactory } from '@adapters/sqlite';
 import { ExecuteGdprErasureUseCase } from '@core/usecases';
+import { shelters } from '@adapters/sqlite/schema';
+import { generateUUIDv7 } from '@core/domain';
 
 describe('Append-Only Audit Logging & GDPR Tombstoning Tests (NFR13, NFR16)', () => {
   let db: any;
   let sqlite: any;
   let factory: ScopedRepositoryFactory;
   let auditRepo: any;
+  let shelterId: string;
 
   beforeEach(() => {
     const instance = createTestDatabase(true);
@@ -14,6 +17,19 @@ describe('Append-Only Audit Logging & GDPR Tombstoning Tests (NFR13, NFR16)', ()
     sqlite = instance.sqlite;
     factory = new ScopedRepositoryFactory(db);
     auditRepo = factory.getAuditLogRepository();
+
+    shelterId = generateUUIDv7();
+    db.insert(shelters).values({
+      id: shelterId,
+      name: 'Audit Test Shelter',
+      description: null,
+      address: null,
+      phone: null,
+      email: null,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }).run();
   });
 
   afterEach(() => {
@@ -22,7 +38,7 @@ describe('Append-Only Audit Logging & GDPR Tombstoning Tests (NFR13, NFR16)', ()
 
   it('NFR13: Appends tamper-evident audit logs and retrieves by entity', async () => {
     await auditRepo.log({
-      shelterId: 'shelter-test-01',
+      shelterId,
       entityType: 'PET',
       entityId: 'pet-test-01',
       action: 'CREATE',
@@ -33,7 +49,7 @@ describe('Append-Only Audit Logging & GDPR Tombstoning Tests (NFR13, NFR16)', ()
     });
 
     await auditRepo.log({
-      shelterId: 'shelter-test-01',
+      shelterId,
       entityType: 'PET',
       entityId: 'pet-test-01',
       action: 'UPDATE',
@@ -51,7 +67,7 @@ describe('Append-Only Audit Logging & GDPR Tombstoning Tests (NFR13, NFR16)', ()
 
   it('NFR16: Replaces actor PII with [GDPR ERASURE VERIFIED] without deleting audit records', async () => {
     await auditRepo.log({
-      shelterId: 'shelter-test-01',
+      shelterId,
       entityType: 'PET',
       entityId: 'pet-123',
       action: 'CREATE',
