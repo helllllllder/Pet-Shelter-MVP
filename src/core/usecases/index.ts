@@ -16,3 +16,5 @@ export * from './inventory/evaluate-alerts';
 export * from './inventory/create-usage-template';
 export * from './inventory/apply-usage-template';
 export * from './maintenance/create-maintenance-task';
+export * from './maintenance/complete-maintenance-task';
+export * from './maintenance/list-overdue-tasks';
