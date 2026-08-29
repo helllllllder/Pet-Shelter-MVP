@@ -3,7 +3,9 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ES2022"],
+    "lib": [
+      "ES2022"
+    ],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -12,10 +14,21 @@
     "isolatedModules": true,
     "baseUrl": ".",
     "paths": {
-      "@core/*": ["src/core/*"],
-      "@adapters/*": ["src/adapters/*"],
-      "@ui/*": ["src/ui/*"]
+      "@core/*": [
+        "src/core/*"
+      ],
+      "@adapters/*": [
+        "src/adapters/*"
+      ],
+      "@ui/*": [
+        "src/ui/*"
+      ]
     }
   },
-  "include": ["src/**/*", "tests/**/*", "vitest.config.ts"]
+  "include": [
+    "src/**/*",
+    "tests/**/*",
+    "vitest.config.ts"
+  ],
+  "extends": "expo/tsconfig.base"
 }
