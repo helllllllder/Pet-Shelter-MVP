@@ -1,85 +1,42 @@
-# Luna's Pet Central
+# Ubiquitous Language Glossary & Domain Concepts
 
-An offline-first operations management system enabling a single operator to manage multiple independent animal shelters on a single device, providing full lifecycle pet tracking, clinical care scheduling, and structured data portability.
+## Core Actors & Identity
+- **Operator**: The human user operating the device locally on behalf of one or more shelters.
+- **Shelter**: An independent local data container representing an animal rescue organization, facility, or branch.
+- **Active Shelter Context**: The currently selected shelter container whose data is actively loaded, queried, and mutated.
+- **Device Install ID**: A UUIDv7 generated upon initial app startup identifying the physical local installation.
 
-## Language
+## Pet Management
+- **Pet Profile**: The authoritative operational record of an individual animal under shelter care.
+- **Estimated Date of Birth (DOB)**: An indicator flag (`is_dob_estimated`) denoting that a pet's birthday was approximated upon rescue intake.
+- **Intake Origin**: The historical origin category of a pet (`STREET_RESCUE`, `OWNER_SURRENDER`, `TRANSFER_INTERNAL`, `TRANSFER_EXTERNAL`, `BORN_IN_SHELTER`, `OTHER`).
+- **Pet Outcome**: The terminal or non-terminal disposition state of a pet (`ACTIVE`, `IN_FOSTER`, `ADOPTED`, `DECEASED`, `TRANSFERRED_INTERNAL`, `TRANSFERRED_EXTERNAL`).
+- **In Foster**: A reversible non-archived state where an animal remains under shelter custody but resides in a temporary foster home.
+- **Adopter Details**: Personally Identifiable Information (PII) captured upon adoption (Name, Phone, Address).
+- **Shadow Record**: An immutable, read-only replica of a pet's history preserved at the originating shelter during an internal transfer.
 
-### Operator & Tenancy
+## Veterinary & Medical Care
+- **Vet Clinic**: A veterinary hospital or clinic facility scoped to the active shelter.
+- **Veterinarian**: An individual practitioner linked to a specific clinic.
+- **Vet Appointment**: A medical consultation record linked to a pet, clinic, and optional veterinarian.
+- **Retroactive Appointment**: An appointment logged with a historical past timestamp, requiring explicit operator confirmation.
+- **Care Event**: A scheduled or recurring medical/husbandry treatment (`VACCINE`, `VERMIFUGE`, `MEDICATION`, `PHYSICAL_THERAPY`, `HOSPITALIZATION`, `OTHER`).
+- **Care Occurrence**: An individual scheduled instance of a recurring care event with a specific due date and completion status (`SCHEDULED`, `ADMINISTERED`, `MISSED`, `CANCELLED`).
 
-**Operator**:
-The single local individual registered on the device who manages one or more independent shelters.
-_Avoid_: User, account, administrator, staff member
+## Phase 2: Inventory & Maintenance Operations
+- **Inventory Item**: A tracked physical resource belonging to a shelter, classified under a strict category (`FOOD`, `MEDICATION`, `CLEANING_SUPPLIES`, `EQUIPMENT`, `OTHER`).
+- **Unit of Measure (UoM)**: The standard quantity unit used for inventory tracking (`UNITS`, `KG`, `G`, `L`, `ML`).
+- **Inventory Alert Rule**: A declarative rule that triggers an in-app operational warning when stock quantity falls below a threshold, reaches an estimated depletion date, or approaches expiration within a defined window.
+- **Inventory Usage Template**: A pre-configured bundle of items and quantities that can be decremented in a single atomic transaction during care event recording (e.g., "Standard Puppy Vaccination Pack" -> 1 dose vaccine, 1 syringe, 1 alcohol wipe).
+- **Maintenance Task**: A facility maintenance or equipment care task classified by type (`REPAIR`, `PREVENTIVE_MAINTENANCE`, `CLEANING`), with scheduled dates, optional recurrence, and optional staff assignment.
+- **Task Completion Log**: An immutable record logging the exact timestamp, completion notes, and operator identity when a maintenance task is marked done.
 
-**Shelter**:
-An independent operational organization and data container for animal rescue activities.
-_Avoid_: Facility, branch, tenant, sanctuary profile
+## Phase 2: Notification Tiers & Reliability
+- **Standard Notification Tier**: Fast local in-app alert delivered directly to the operator's active screen/tray within <5 seconds.
+- **Custom Notification Tier**: Configurable external notification channel (Email / Push notification) for multi-channel alerting.
+- **Delivery State Machine**: The lifecycle state of a notification (`PENDING`, `DELIVERED`, `FAILED`, `ESCALATED`).
+- **Escalation Banner**: An emergency in-app banner rendered on screen when an external notification fails delivery after 3 retry attempts with exponential backoff.
 
-**Shelter Context**:
-The currently selected shelter scope that restricts all queries, views, and record mutations to that specific shelter.
-_Avoid_: Active session, workspace, active view, tenant environment
-
-### Pet Profile & Lifecycle
-
-**Pet**:
-An individual animal registered and tracked within a specific shelter.
-_Avoid_: Animal, patient, guest, resident
-
-**Intake Origin**:
-The documented source from which a pet arrived at the shelter (e.g., Street Rescue, Owner Surrender, Transfer, Born at Shelter, Other).
-_Avoid_: Entry source, acquisition method, intake type
-
-**Estimated DOB**:
-A boolean indicator signifying that a pet's recorded date of birth is an approximate calculation rather than a verified date.
-_Avoid_: Approximate age, guessed birthday, age estimate
-
-**Available for Adoption**:
-A boolean flag indicating that an active pet is ready and eligible for adoption placement.
-_Avoid_: Up for adoption, adoptable flag, listing status
-
-**Outcome**:
-The terminal or transitional disposition of a pet (Adopted, Deceased, Transferred, In Foster) that archives the active profile while preserving complete historical records.
-_Avoid_: Exit status, discharge, closure, status change
-
-**In Foster**:
-A reversible lifecycle state where a pet temporarily resides with a foster caregiver while remaining under active shelter responsibility.
-_Avoid_: Temporary custody, fostered state, out on foster
-
-**Adopter Details**:
-The mandatory contact information (name, phone, address) captured for the person legally adopting a pet.
-_Avoid_: Buyer info, customer record, adopter profile
-
-**Shadow Record**:
-An immutable, read-only historical record preserved at an originating shelter when a pet is transferred internally to another shelter.
-_Avoid_: Historical clone, transfer copy, archive snapshot
-
-### Veterinary & Clinical Care
-
-**Vet Directory**:
-A shelter-scoped registry of external veterinary clinics and licensed medical professionals.
-_Avoid_: Clinic address book, doctor contacts, vet list
-
-**Vet Appointment**:
-A logged clinical consultation with a veterinarian from the directory, optionally holding attached diagnostic files and linked care events.
-_Avoid_: Clinical visit, doctor consult, checkup
-
-**Care Event**:
-A scheduled treatment or healthcare protocol (Vaccine, Vermifuge, Medication, Physical Therapy, Hospitalization, Other) with defined recurrence rules.
-_Avoid_: Treatment plan, medical task, medication order
-
-**Care Occurrence**:
-A single discrete instance of a care event scheduled for or administered on a specific due date.
-_Avoid_: Treatment instance, dose log, care task
-
-### Operations & Data Governance
-
-**Data Export**:
-A complete, structured JSON archive and asset bundle representing one or all shelters for backup and future cloud migration.
-_Avoid_: Backup dump, database download, file extract
-
-**Tombstoning**:
-The cryptographic replacement of Personally Identifiable Information with a standard verified token in immutable audit logs following a GDPR deletion request.
-_Avoid_: Row scrubbing, data erasure, hard deletion, record purge
-
-**Audit Log**:
-An append-only, tamper-evident record of all critical administrative, clinical, and lifecycle state changes.
-_Avoid_: Event history, activity tracker, change log\n
+## Data Governance & Privacy
+- **Audit Log**: An append-only, tamper-evident log capturing entity mutations (`CREATE`, `UPDATE`, `DELETE`, `OUTCOME_CHANGE`, `INVENTORY_ADJUSTMENT`, `GDPR_ERASURE`).
+- **Tombstoning**: Replacing personal identifiable information with `[GDPR ERASURE VERIFIED]` while preserving log structure and referential integrity.
