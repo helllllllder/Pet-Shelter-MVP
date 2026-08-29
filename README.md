@@ -61,54 +61,55 @@ Pet-Shelter-MVP/
 └── README.md
 ```
 
-## Documentation
+## User Documentation & Operator Guides
+
+| Document | Description |
+| :--- | :--- |
+| 🚀 **[Quickstart Guide](./docs/user-guide/QUICKSTART.md)** | 2-minute orientation covering first launch, operator setup, animal intake, and care decrements. |
+| 📖 **[Operator & User Manual](./docs/user-guide/USER-MANUAL.md)** | Comprehensive 12-section manual detailing all Phase 1 & Phase 2 features and workflows. |
+| 🌐 **[Interactive Visual Guide](./docs/user-guide/interactive-guide.html)** | Self-contained visual guide with interactive architecture diagrams and feature walkthroughs. |
+
+---
+
+## Technical & Architecture Documentation
 
 | Document | Description |
 |----------|-------------|
-| [CONTEXT.md](./CONTEXT.md) | Domain glossary and vocabulary |
+| [CONTEXT.md](./CONTEXT.md) | Domain glossary and ubiquitous terminology |
 | [PRD.md](./docs/product/PRD.md) | Product Requirements Document (v3.0) |
 | [BRD.md](./docs/product/BRD.md) | Business Requirements Document |
 | [RTM.md](./docs/product/RTM.md) | Requirements Traceability Matrix |
 | [phase1-offline-core.md](./docs/architecture/phase1-offline-core.md) | Phase 1 Technical Architecture Specification |
+| [phase2-inventory-maintenance.md](./docs/architecture/phase2-inventory-maintenance.md) | Phase 2 Categorized Inventory, Maintenance & Notifications Spec |
 | [ADR-0001](./docs/adr/0001-cross-platform-framework-react-native-expo.md) | Cross-Platform Framework Selection |
 | [ADR-0002](./docs/adr/0002-storage-engine-native-sqlite-drizzle-orm.md) | Storage Engine & Query Layer |
 | [ADR-0003](./docs/adr/0003-local-multi-tenant-isolation-scoped-repositories.md) | Local Multi-Tenant Isolation Strategy |
+| [ADR-0004](./docs/adr/0004-inventory-decrement-and-notification-escalation.md) | 1-Click Inventory Decrement & Escalation Policy |
 
-## Roadmap
+---
 
-### Phase 1: Offline-First Core (MVP v1.0)
-- Single operator, single device
-- Multiple independent shelter containers
-- Pet lifecycle management
-- Veterinary appointment tracking
-- Care event scheduling with reminders
-- Inventory management
-- Structured data export (JSON + ZIP archive)
-- Full offline operation
+## Roadmap & Delivery Status
 
-### Phase 2: Online Foundation (Deferred)
-- Cloud backend (PostgreSQL/Supabase)
-- Multi-user support with role-based access control
-- Email and push notifications
-- Shareable profile links
+### ✅ Phase 1: Offline-First Core (MVP v1.0 — Completed & Closed)
+- Local operator auto-login profile
+- Multi-shelter container isolation with dirty form safeguards
+- Pet lifecycle management (intake $\rightarrow$ adoption PII capture)
+- Veterinary appointment tracking & clinic directory
+- Care event recurrence engine with due-date alert badges
+- Structured JSON data export with SHA-256 integrity checksums
+- Append-only audit logger & GDPR PII tombstoning
 
-### Phase 3: Web Platform (Deferred)
-- Web application via React DOM
-- Shared domain layer with mobile app
-- Google SSO authentication
+### ✅ Phase 2: Inventory, Maintenance & Notification Tiers (Completed & Closed)
+- 5-category inventory tracking (Food, Medication, Cleaning, Equipment, Other)
+- Configurable alert rules (low-stock thresholds & expiration windows evaluated in <50ms)
+- 1-click usage template kits with atomic care event inventory decrements
+- Maintenance task scheduling (Repair, Preventive, Cleaning) with completion logs
+- Two-tier notification dispatch (Standard in-app <5s vs Custom multi-channel)
+- 3-retry delivery state machine with emergency in-app banner escalation
 
-## Key Design Decisions
+---
 
-1. **Offline-First by Default** — No network dependency in Phase 1. All data stored locally in SQLite.
-2. **Multi-Shelter Isolation** — Unified database with scoped repository interceptors prevent cross-shelter data leakage.
-3. **Cloud-Ready Schema** — UUIDv7 primary keys, UTC timestamps, and standard SQL types ensure seamless migration to PostgreSQL in Phase 3.
-4. **Platform-Agnostic Core** — Domain logic, validation schemas, and repository contracts are 100% TypeScript with zero native dependencies.
-
-## Development
-
-*This repository contains project documentation and architecture specifications. Application source code will be added as development progresses.*
-
-### Local Development Setup (Future)
+## Development & Testing
 
 ```bash
 # Clone the repository
@@ -118,10 +119,14 @@ cd Pet-Shelter-MVP
 # Install dependencies
 npm install
 
-# Start development server
-npx expo start
+# Run comprehensive test suite (51 tests across 20 test files)
+npm test
+
+# Run strict TypeScript typechecking
+npm run typecheck
 ```
 
 ## License
 
 [MIT](./LICENSE)
+
