@@ -15,3 +15,4 @@ export * from './inventory/create-alert-rule';
 export * from './inventory/evaluate-alerts';
 export * from './inventory/create-usage-template';
 export * from './inventory/apply-usage-template';
+export * from './maintenance/create-maintenance-task';

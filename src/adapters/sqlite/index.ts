@@ -8,4 +8,5 @@ export * from './vet-directory-repository';
 export * from './care-event-repository';
 export * from './audit-log-repository';
 export * from './inventory-repository';
+export * from './maintenance-repository';
 export * from './factory';
