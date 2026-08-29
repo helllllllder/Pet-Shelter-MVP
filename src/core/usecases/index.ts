@@ -19,3 +19,5 @@ export * from './maintenance/create-maintenance-task';
 export * from './maintenance/complete-maintenance-task';
 export * from './maintenance/list-overdue-tasks';
 export * from './notifications/dispatch-notification';
+export * from './notifications/retry-notification-delivery';
+export * from './notifications/dismiss-notification-escalation';
