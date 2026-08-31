@@ -12,6 +12,20 @@ import type {
   AuditActorType,
 } from "./enums.js";
 
+export type {
+  IntakeOrigin,
+  HealthStatus,
+  PetOutcomeStatus,
+  PetSex,
+  MediaType,
+  CareModality,
+  RecurrenceIntervalUnit,
+  CareEventStatus,
+  CareOccurrenceStatus,
+  AuditAction,
+  AuditActorType,
+};
+
 export interface OperatorProfile {
   id: string;
   name: string;
