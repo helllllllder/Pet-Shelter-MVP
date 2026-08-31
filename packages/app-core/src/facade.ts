@@ -11,12 +11,14 @@ import type {
   VetAppointment,
   VetDocument,
   CareEvent,
+  CareOccurrence,
   CareEventStatus,
 } from "../../contracts/src/index.js";
 import { PetService } from "./pet-service.js";
 import { PetLifecycleService } from "./pet-lifecycle-service.js";
 import { DashboardService } from "./dashboard-service.js";
 import { VeterinaryService } from "./veterinary-service.js";
+import { CareEventService } from "./care-event-service.js";
 import type { SqliteRepositoryFactory } from "../../adapter-sqlite/src/index.js";
 import { generateUUIDv7 } from "../../domain/src/index.js";
 
@@ -25,6 +27,7 @@ export class ShelterAppFacadeImpl implements ShelterAppFacade {
   private readonly lifecycleService: PetLifecycleService;
   private readonly dashboardService: DashboardService;
   private readonly vetService: VeterinaryService;
+  private readonly careService: CareEventService;
 
   constructor(private readonly factory: SqliteRepositoryFactory) {
     this.petService = new PetService(
@@ -43,6 +46,10 @@ export class ShelterAppFacadeImpl implements ShelterAppFacade {
     this.vetService = new VeterinaryService(
       this.factory.vetDirectoryRepo,
       this.factory.appointmentRepo,
+      this.factory.auditLogRepo
+    );
+    this.careService = new CareEventService(
+      this.factory.careEventRepo,
       this.factory.auditLogRepo
     );
   }
@@ -402,33 +409,77 @@ export class ShelterAppFacadeImpl implements ShelterAppFacade {
     shelterId: string,
     data: Omit<CareEvent, "id" | "shelterId" | "status" | "createdAt" | "updatedAt">
   ): Promise<CareEvent> {
-    const id = generateUUIDv7();
     const domainModality =
       data.modality === "PhysicalTherapy"
         ? "Physical Therapy"
         : data.modality;
-    const event = await this.factory.careEventRepo.create({
-      id,
-      shelterId,
+
+    const event = await this.careService.createCareEvent(shelterId, {
       petId: data.petId,
-      appointmentId: data.appointmentId || null,
+      appointmentId: data.appointmentId,
       modality: domainModality as any,
-      substance: data.substance || null,
-      instructions: data.instructions || null,
+      substance: data.substance,
+      instructions: data.instructions,
+      startDate: data.startDate || data.dueDate || new Date().toISOString(),
+      endDate: data.temporaryEndDate || null,
       isRecurring: data.recurrenceRule !== undefined,
       recurrenceIntervalValue: data.recurrenceRule?.interval || null,
       recurrenceIntervalUnit: data.recurrenceRule?.unit || null,
       isTemporary: data.temporaryEndDate !== undefined,
-      startDate: new Date().toISOString(),
-      endDate: data.temporaryEndDate || null,
-      status: "ACTIVE",
     });
+
     return this.mapCareEvent(event);
   }
 
   async listCareEvents(petId: string, shelterId: string): Promise<CareEvent[]> {
     const list = await this.factory.careEventRepo.listByPet(petId, shelterId);
     return list.map((e) => this.mapCareEvent(e));
+  }
+
+  async completeCareOccurrence(
+    shelterId: string,
+    occurrenceId: string,
+    completedAt?: string,
+    notes?: string
+  ): Promise<CareOccurrence> {
+    const occ = await this.careService.completeOccurrence(
+      shelterId,
+      occurrenceId,
+      completedAt,
+      notes
+    );
+    return this.mapOccurrenceToContract(occ);
+  }
+
+  async skipCareOccurrence(
+    shelterId: string,
+    occurrenceId: string,
+    notes?: string
+  ): Promise<CareOccurrence> {
+    const occ = await this.careService.skipOccurrence(shelterId, occurrenceId, notes);
+    return this.mapOccurrenceToContract(occ);
+  }
+
+  async cancelCareOccurrence(
+    shelterId: string,
+    occurrenceId: string
+  ): Promise<CareOccurrence> {
+    const occ = await this.careService.cancelOccurrence(shelterId, occurrenceId);
+    return this.mapOccurrenceToContract(occ);
+  }
+
+  async cancelCareEvent(shelterId: string, careEventId: string): Promise<number> {
+    return this.careService.cancelCareEvent(shelterId, careEventId);
+  }
+
+  async listCareOccurrences(petId: string, shelterId: string): Promise<CareOccurrence[]> {
+    const occs = await this.careService.listOccurrencesByPet(shelterId, petId);
+    return occs.map((o) => this.mapOccurrenceToContract(o));
+  }
+
+  async listDueCareOccurrences(shelterId: string, beforeDate?: string): Promise<CareOccurrence[]> {
+    const occs = await this.careService.listDueOccurrences(shelterId, beforeDate);
+    return occs.map((o) => this.mapOccurrenceToContract(o));
   }
 
   // Dashboard
@@ -519,6 +570,28 @@ export class ShelterAppFacadeImpl implements ShelterAppFacade {
       mimeType: doc.mimeType,
       fileSizeBytes: doc.fileSizeBytes,
       createdAt: doc.createdAt,
+    };
+  }
+
+  private mapOccurrenceToContract(occ: any): CareOccurrence {
+    const status =
+      occ.status === "COMPLETED"
+        ? "Completed"
+        : occ.status === "SKIPPED"
+        ? "Skipped"
+        : occ.status === "CANCELLED"
+        ? "Cancelled"
+        : "Pending";
+
+    return {
+      id: occ.id,
+      careEventId: occ.careEventId,
+      scheduledDate: occ.dueDate,
+      actualDate: occ.completedAt || undefined,
+      status,
+      notes: occ.notes || undefined,
+      createdAt: occ.createdAt,
+      updatedAt: occ.updatedAt,
     };
   }
 
