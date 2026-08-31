@@ -8,7 +8,8 @@
     "test:e2e": "vitest run tests/e2e",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
-    "mobile": "npx --prefix packages/ui-mobile expo start"
+    "mobile": "pnpm --filter @luna/ui-mobile exec expo start",
+    "web": "pnpm --filter @luna/ui-mobile exec expo start --web"
   },
   "dependencies": {
     "better-sqlite3": "^11.8.1",
