@@ -10,8 +10,8 @@
 | **Email**        | [hellder.souza@proton.me](mailto:hellder.souza@proton.me)                                                                                                                                       |
 | **Document No.** | BRD-LPC-001                                                                                                                                                                                     |
 | **Date**         | 2026-08-28                                                                                                                                                                                      |
-| **Last Updated** | 2026-08-30 — Phase annotations added to In-Scope, Proposed Process, and KPIs; glossary corrected (In Foster removed from Archived Pet); NFR02 remarks phase-scoped; Future items annotated; terminology note added |
-| **Version**      | 3.2                                                                                                                                                                                             |
+| **Last Updated** | 2026-08-30 — Aligned Phase 1 (MVP) scope with MVP.md: promoted Pet Search & Filter (FR30-A) and Per-shelter Dashboard Overview (FR31) to Phase 1 (MVP); moved Data Export (FR03-A/B) and Local Shelter Deletion/Close (FR02-C) to Phase 2 (Operational Enrichment); updated In-Scope, Section 9 MVP Definition, Section 10 Functional Requirements table, Section 11 NFR remarks, and Appendix G |
+| **Version**      | 3.3                                                                                                                                                                                             |
 
 
 ---
@@ -20,7 +20,7 @@
 
 Luna's Pet Central is an offline-first, single-user shelter operations management tool designed for fast hypothesis validation on a single device. The platform enables a single operator to manage multiple local shelter profiles, providing end-to-end digital management of pet records, medical history, inventory, and facility maintenance.
 
-The single operator creates a local profile (name, contact/email) with no third-party login required. One operator manages multiple shelter profiles locally. The system provides full data export capability for future migration. The pet lifecycle has been expanded to include an "In Foster" status alongside Adopted, Deceased, and Transferred outcomes, with mandatory adopter details capture upon adoption.
+The single operator creates a local profile (name, contact/email) with no third-party login required. One operator manages multiple shelter profiles locally. The system provides search and filtering for pets, per-shelter dashboard overview, and comprehensive pet lifecycle management (including an "In Foster" status alongside Adopted, Deceased, and Transferred outcomes, with mandatory adopter details capture upon adoption).
 
 **Goal / Purpose of this BRD**: To formally document the business requirements for the development of the offline-first MVP of Luna's Pet Central so that all stakeholders have a clear, agreed-upon foundation for the project.
 
@@ -60,25 +60,29 @@ The project is driven by the need to professionalize shelter operations, improve
 
 ### In-Scope
 
-- **Local Operator Profile**: Single-user registration with basic profile data (name, contact/email) stored locally on the device. No dependency on external authentication services. Access is immediate and offline.
-- **Data Export**: Complete local data export capability allowing the operator to extract all shelter records for backup or future migration to online versions.
-- **Single-User Operation**: All operations performed by one operator on one device. Multi-user access control is deferred to the online phase.
-- **Multi-Shelter Management**: The operator can create, manage, and switch between multiple local shelter profiles on a single device. Each shelter maintains independent data.
-- **Pet Registration**: Complete pet profile creation with all relevant demographic and health data, including intake origin, adoption availability flag, and an estimated date-of-birth flag for animals with unknown birthdates.
+- **Local Operator Profile**: Single-user registration with basic profile data (name, contact/email) stored locally on the device, profile visualization, and profile update. No dependency on external authentication services. Access is immediate and offline.
+- **Local Shelter Management**: The operator can create, edit, and switch between multiple local shelter profiles on a single device. Each shelter maintains independent data.
+- **Local Shelter Deletion/Close**: *(Phase 2)* Closing or deleting local shelter data containers once all active pets are resolved, retaining data in read-only mode.
+- **Data Export**: *(Phase 2)* Complete local data export capability allowing the operator to extract all shelter records for backup or future migration to online versions.
+- **Single-User Operation**: All operations performed by one operator on one device in Phase 1. Multi-user access control is deferred to the online phase (Phase 3+).
+- **Pet Registration & Profile Management**: Complete pet profile creation, visualization, update, and hard deletion with all relevant demographic and health data, including intake origin, adoption availability flag, and an estimated date-of-birth flag for animals with unknown birthdates.
+- **Pet Search and Filtering**: *(Phase 1 — MVP)* Case-insensitive search and filtering across pets by name, species, status (Active, In Foster, Archived), and adoption availability within the active shelter.
 - **Pet Lifecycle Management**: Distinct outcome statuses — Adopted, Deceased, Transferred, and In Foster — that archive the pet and preserve full history. Adoption requires capturing adopter details (Name, Phone, Address).
 - **Internal Transfer Shadow Records**: When a pet is transferred between shelters within the platform, a read-only shadow record is created in the receiving shelter linking back to the original record. The transfer migrates all active treatments to the receiving shelter. *(Future — v2.0+)*
-- **Pet Media**: Photos and videos uploadable to pet profiles.
-- **Veterinary Clinic &amp; Professional Directory**: A searchable directory of clinics and veterinarians, reusable across appointments.
-- **Veterinary Appointment Tracking**: Logging appointments with clinic/hospital and veterinarian selected from the directory, including document uploads (PDF, images). Appointments support soft delete with preservation of any linked care event references. *(Future — v2.0+)*
-- **Pet Care Tracking**: Scheduling and recording of recurring care events including vaccines, vermifuge treatments, and temporary medications. Care events can be optionally linked to a vet appointment.
+- **Pet Media**: Photos and videos uploadable to and deletable from pet profiles.
+- **Veterinary Clinic & Professional Directory**: A searchable directory of clinics and veterinarians with registration, editing, and soft-delete capabilities, reusable across appointments.
+- **Veterinary Appointment Tracking**: Logging and editing appointments with clinic/hospital and veterinarian selected from the directory, including document uploads (PDF, images) and retroactive date warnings. Appointments support soft delete with preservation of linked care event references in Future *(v2.0+)*.
+- **Pet Care Tracking**: Scheduling, recording, editing, and deletion of recurring care events including vaccines, vermifuge treatments, and temporary medications. Care events can be optionally linked to a vet appointment.
+- **Local In-App Notifications**: On-due-date in-app alerts for scheduled care events in Phase 1.
+- **Per-shelter Dashboard Overview**: *(Phase 1 — MVP)* Real-time summary views covering active pet counts, treatments in progress, foster counts, and care activity.
 - **Proactive Care Event Reminders**: *(Phase 4)* In-app reminders sent 7, 3, and 1 day before a care event's due date.
 - **Inventory / Stock Management**: *(Phase 2)* Categorized tracking of all shelter consumables with quantity, units, purchase date, and expiration date fields.
 - **Dynamic Inventory Alerts**: *(Phase 2)* Configurable notifications triggered by low stock thresholds and approaching expiration dates.
 - **Inventory Usage Templates**: *(Phase 2)* Pre-configured templates enabling 1-click inventory decrement directly from care event recording.
-- **Maintenance Scheduling**: *(Phase 2)* Creation and tracking of maintenance tasks with optional staff assignment and notifications.
-- **Notification System**: Basic local in-app notifications only for reminders and alerts.
-- **Search and Filtering**: *(Phase 4)* Search across pets and inventory; filter maintenance tasks by type and status.
-- **Reporting and Dashboards**: *(Phase 4)* Summary views covering active pet counts, staff counts, care activity, inventory status, and maintenance history.
+- **Maintenance Scheduling**: *(Phase 2)* Creation, editing, deletion, and tracking of maintenance tasks with optional staff assignment and notifications.
+- **Notification System (Two-Tier)**: *(Phase 2)* Standard (in-app) and Custom (email/push) notification delivery with retry and failure escalation.
+- **Secondary Search and Filtering**: *(Phase 4)* Search across inventory items by name, category, and alert status; filter maintenance tasks by type and status.
+- **Reporting and Deep Analytics**: *(Phase 4)* Advanced summary and historical views covering pet census, archived pet logs, treatment lists, inventory reports, maintenance history, staff headcount, care event summaries, and shareable link activity logs.
 - **Data Deletion (GDPR)**: *(Phase 3+)* Support for GDPR data deletion requests featuring a 7-day cooling-off period before hard deletion, during which the requesting Admin may cancel the deletion request with a single click, restoring the data, utilizing "Tombstoning" to replace PII in immutable audit logs.
 
 ### Out-of-Scope
@@ -221,21 +225,23 @@ The proposed process through Luna's Pet Central establishes a fully digital work
 
 ### MVP (Phase 1 — Offline Validation)
 
-- Local operator profile registration (name, contact/email) with offline access
-- Local shelter creation and multi-shelter management on a single device
-- Shelter context switching
-- Data export for portability and future migration
-- Pet registration and profile management (including estimated DOB flag, intake origin with 'Other' + detail, health status/conditions, photo/video media capture, adoption availability flag)
+- Local operator profile registration (name, contact/email) with offline access, visualization, and update
+- Local shelter creation, update, and context switching on a single device
+- Pet registration, profile visualization, update, and hard deletion (including estimated DOB flag, intake origin with 'Other' + detail, health status/conditions, photo/video media capture/deletion, adoption availability flag)
+- Pet search and filtering (by name, species, status, adoption availability)
 - Pet lifecycle management (Active, In Foster, Adopted, Deceased, Transferred - External) with mandatory adopter details capture on adoption
 - Archival side-effects: auto-cancel pending care events, clear adoption availability flag
-- Veterinary clinic and professional directory (shelter-scoped)
-- Veterinary appointment logging (with retroactive date warning) and document upload
-- Care event recording and scheduling with recurrence intervals
+- Veterinary clinic and professional directory (shelter-scoped) with registration, search, edit, and soft delete
+- Veterinary appointment logging (with retroactive date warning), document upload/storage, and edit
+- Care event recording, scheduling with recurrence intervals, temporary care events, edit, and delete
 - Optional bidirectional linking between care events and appointments
 - Local in-app due-date alerts for care events
+- Per-shelter dashboard overview (live KPIs for active pets, treatments, foster pets, care events)
 
 ### Phase 2 (v1.1 — Operational Enrichment)
 
+- Local shelter deletion/close (blocked if active pets exist; preserved in read-only mode)
+- Local data export for single shelter and all shelters (data portability and backup)
 - Inventory management with categorized tracking
 - Per-item inventory alert rules and notifications
 - Inventory usage templates (1-click decrement from care events)
@@ -253,16 +259,19 @@ The proposed process through Luna's Pet Central establishes a fully digital work
 - Configurable TTL (max 90 days, renewable)
 - Link revocation and activity logging
 
-### Phase 4 (v1.3 — Reporting &amp; Discovery)
+### Phase 4 (v1.3 — Reporting & Discovery)
 
 - Proactive care event reminders (7, 3, and 1 day before due date)
-- Dashboard and reporting module
-- Pet reports (census, archived log, treatment list)
-- Inventory reports (status, alert history)
-- Maintenance reports (scheduled, completed, overdue)
-- Staff and care event reports
-- Shareable link activity log
-- Search and filtering across all entities
+- Secondary search and filtering (inventory search and maintenance task search/filtering)
+- Advanced reporting module:
+  - Pet census report (active pets grouped by species)
+  - Archived pet log report (by outcome with adopter details for adopted pets)
+  - Treatment list report (pets with active temporary care events)
+  - Inventory status report & alert history report
+  - Maintenance task status report & cleaning event frequency report
+  - Staff headcount report (Admins only)
+  - Care event summary report
+  - Shareable link activity log (Admins only)
 
 ### Future (v2.0+)
 
@@ -282,9 +291,9 @@ The proposed process through Luna's Pet Central establishes a fully digital work
 | FR01-C | Local operator profile edit — update name/contact/email at any time.                                                                  | Phase 1 (MVP) | 1        | Helder Souza |
 | FR02-A | Local shelter creation — form with required name + optional details, auto-sets as active context, duplicate names allowed.            | Phase 1 (MVP) | 1        | Helder Souza |
 | FR02-B | Local shelter edit — update name/details at any time.                                                                                 | Phase 1 (MVP) | 1        | Helder Souza |
-| FR02-C | Local shelter deletion/close — closure blocked if active pets exist; closed shelters preserved in read-only mode.                     | Phase 1 (MVP) | 1        | Helder Souza |
-| FR03-A | Single-shelter data export — portable format for one shelter, local save location chosen by operator.                                 | Phase 1 (MVP) | 1        | Helder Souza |
-| FR03-B | All-shelters data export — single portable export from every shelter on device.                                                       | Phase 1 (MVP) | 1        | Helder Souza |
+| FR02-C | Local shelter deletion/close — closure blocked if active pets exist; closed shelters preserved in read-only mode.                     | Phase 2       | 1        | Helder Souza |
+| FR03-A | Single-shelter data export — portable format for one shelter, local save location chosen by operator.                                 | Phase 2       | 1        | Helder Souza |
+| FR03-B | All-shelters data export — single portable export from every shelter on device.                                                       | Phase 2       | 1        | Helder Souza |
 | FR04   | Single-user shelter context switching — all operations scoped to active shelter, switch via selector.                                 | Phase 1 (MVP) | 1        | Helder Souza |
 | FR05-A | Pet profile creation — required fields with validation, estimated DOB flag, intake origin 'Other' + free text.                        | Phase 1 (MVP) | 1        | Helder Souza |
 | FR05-B | Pet profile edit — update any field, same validation as create, duplicate names allowed.                                              | Phase 1 (MVP) | 1        | Helder Souza |
@@ -332,10 +341,10 @@ The proposed process through Luna's Pet Central establishes a fully digital work
 | FR28-A | Adoption Profile link generation restriction — requires 'Available for Adoption' flag active.                                         | Phase 3       | 2        | Helder Souza |
 | FR28-B | Shareable link prohibition for archived pets — no new links for archived pets, auto-revoke on archival.                               | Phase 3       | 2        | Helder Souza |
 | FR29   | Manual link revocation — revoke any active link, immediate invalidation.                                                              | Phase 3       | 2        | Helder Souza |
-| FR30-A | Pet search and filtering — by name, species, status, adoption availability, shelter-scoped.                                           | Phase 4       | 3        | Helder Souza |
+| FR30-A | Pet search and filtering — by name, species, status, adoption availability, shelter-scoped.                                           | Phase 1 (MVP) | 3        | Helder Souza |
 | FR30-B | Inventory search and filtering — by name, category, alert status, shelter-scoped.                                                     | Phase 4       | 3        | Helder Souza |
 | FR30-C | Maintenance task search and filtering — by type, status, shelter-scoped.                                                              | Phase 4       | 3        | Helder Souza |
-| FR31   | Per-shelter dashboard overview — KPIs: active pets, treatment count, foster count, staff, inventory alerts, maintenance, care events. | Phase 4       | 3        | Helder Souza |
+| FR31   | Per-shelter dashboard overview — KPIs: active pets, treatment count, foster count, staff, inventory alerts, maintenance, care events. | Phase 1 (MVP) | 3        | Helder Souza |
 | FR32-A | Pet census report — active pets grouped by species.                                                                                   | Phase 4       | 3        | Helder Souza |
 | FR32-B | Archived pet log report — by outcome with adopter details for adopted pets.                                                           | Phase 4       | 3        | Helder Souza |
 | FR32-C | Treatment list report — pets with active temporary care events.                                                                       | Phase 4       | 3        | Helder Souza |
@@ -530,10 +539,10 @@ The proposed process through Luna's Pet Central establishes a fully digital work
 
 | Phase                              | Version | Key Capabilities                                                                                                                                                                                                                                        |
 | :---------------------------------- | :------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MVP (Phase 1 — Offline Validation) | v1.0    | Local operator profile, multi-shelter management, shelter context switching, data export, pet registration and lifecycle management, vet directory, appointment logging (with retroactive warnings), care event recording, local in-app due-date alerts |
-| Phase 2                            | v1.1    | Inventory management, alert rules, usage templates, maintenance scheduling, two-tier notifications, failure escalation                                                                                                                                  |
+| MVP (Phase 1 — Offline Validation) | v1.0    | Local operator profile (register/view/update), shelter management (create/edit/switch), pet registration & lifecycle management (outcomes, adopter capture, archival side-effects, hard delete), pet search & filter, media upload/delete, vet directory (register/search/edit/soft-delete), vet appointments (log/edit/warnings/documents), care events (create/edit/delete/recurring/link/in-app due alerts), per-shelter dashboard overview |
+| Phase 2                            | v1.1    | Local shelter deletion/close, single/all shelter data export, inventory management, alert rules, usage templates, maintenance scheduling, two-tier notifications, failure escalation                                                                                                                                  |
 | Phase 3 (Online Foundation)        | v1.2    | Google SSO authentication, multi-user support, staff invite links, RBAC, shareable pet profile links, configurable TTL, link revocation                                                                                                                 |
-| Phase 4                            | v1.3    | Proactive care event reminders, dashboard and reporting module, pet/inventory/maintenance/staff/link reports, search and filtering                                                                                                                      |
+| Phase 4                            | v1.3    | Proactive care event reminders, secondary search and filtering (inventory, maintenance), advanced reporting module (pet census, archived log, treatments, inventory/maintenance/staff/link reports)                                                                                                                      |
 | Future                             | v2.0+   | Advanced analytics, internal transfer shadow records, appointment soft delete                                                                                                                                                                           |
 
 

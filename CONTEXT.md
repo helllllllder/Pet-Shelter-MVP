@@ -1,42 +1,123 @@
-# Ubiquitous Language Glossary & Domain Concepts
+# Luna's Pet Central
 
-## Core Actors & Identity
-- **Operator**: The human user operating the device locally on behalf of one or more shelters.
-- **Shelter**: An independent local data container representing an animal rescue organization, facility, or branch.
-- **Active Shelter Context**: The currently selected shelter container whose data is actively loaded, queried, and mutated.
-- **Device Install ID**: A UUIDv7 generated upon initial app startup identifying the physical local installation.
+Luna's Pet Central is an operations management system for animal shelters that unifies pet intake, medical care, veterinary coordination, and shelter administration into a single source of truth.
 
-## Pet Management
-- **Pet Profile**: The authoritative operational record of an individual animal under shelter care.
-- **Estimated Date of Birth (DOB)**: An indicator flag (`is_dob_estimated`) denoting that a pet's birthday was approximated upon rescue intake.
-- **Intake Origin**: The historical origin category of a pet (`STREET_RESCUE`, `OWNER_SURRENDER`, `TRANSFER_INTERNAL`, `TRANSFER_EXTERNAL`, `BORN_IN_SHELTER`, `OTHER`).
-- **Pet Outcome**: The terminal or non-terminal disposition state of a pet (`ACTIVE`, `IN_FOSTER`, `ADOPTED`, `DECEASED`, `TRANSFERRED_INTERNAL`, `TRANSFERRED_EXTERNAL`).
-- **In Foster**: A reversible non-archived state where an animal remains under shelter custody but resides in a temporary foster home.
-- **Adopter Details**: Personally Identifiable Information (PII) captured upon adoption (Name, Phone, Address).
-- **Shadow Record**: An immutable, read-only replica of a pet's history preserved at the originating shelter during an internal transfer.
+## Language
 
-## Veterinary & Medical Care
-- **Vet Clinic**: A veterinary hospital or clinic facility scoped to the active shelter.
-- **Veterinarian**: An individual practitioner linked to a specific clinic.
-- **Vet Appointment**: A medical consultation record linked to a pet, clinic, and optional veterinarian.
-- **Retroactive Appointment**: An appointment logged with a historical past timestamp, requiring explicit operator confirmation.
-- **Care Event**: A scheduled or recurring medical/husbandry treatment (`VACCINE`, `VERMIFUGE`, `MEDICATION`, `PHYSICAL_THERAPY`, `HOSPITALIZATION`, `OTHER`).
-- **Care Occurrence**: An individual scheduled instance of a recurring care event with a specific due date and completion status (`SCHEDULED`, `ADMINISTERED`, `MISSED`, `CANCELLED`).
+### Operator & Facility Management
 
-## Phase 2: Inventory & Maintenance Operations
-- **Inventory Item**: A tracked physical resource belonging to a shelter, classified under a strict category (`FOOD`, `MEDICATION`, `CLEANING_SUPPLIES`, `EQUIPMENT`, `OTHER`).
-- **Unit of Measure (UoM)**: The standard quantity unit used for inventory tracking (`UNITS`, `KG`, `G`, `L`, `ML`).
-- **Inventory Alert Rule**: A declarative rule that triggers an in-app operational warning when stock quantity falls below a threshold, reaches an estimated depletion date, or approaches expiration within a defined window.
-- **Inventory Usage Template**: A pre-configured bundle of items and quantities that can be decremented in a single atomic transaction during care event recording (e.g., "Standard Puppy Vaccination Pack" -> 1 dose vaccine, 1 syringe, 1 alcohol wipe).
-- **Maintenance Task**: A facility maintenance or equipment care task classified by type (`REPAIR`, `PREVENTIVE_MAINTENANCE`, `CLEANING`), with scheduled dates, optional recurrence, and optional staff assignment.
-- **Task Completion Log**: An immutable record logging the exact timestamp, completion notes, and operator identity when a maintenance task is marked done.
+**Operator**:
+The single local individual responsible for managing shelters, pets, and administrative data on a device.
+_Avoid_: User, staff member, account holder, admin
 
-## Phase 2: Notification Tiers & Reliability
-- **Standard Notification Tier**: Fast local in-app alert delivered directly to the operator's active screen/tray within <5 seconds.
-- **Custom Notification Tier**: Configurable external notification channel (Email / Push notification) for multi-channel alerting.
-- **Delivery State Machine**: The lifecycle state of a notification (`PENDING`, `DELIVERED`, `FAILED`, `ESCALATED`).
-- **Escalation Banner**: An emergency in-app banner rendered on screen when an external notification fails delivery after 3 retry attempts with exponential backoff.
+**Shelter**:
+An independent operational facility and data container managing its own animals, veterinary directory, appointments, and care records.
+_Avoid_: Facility, branch, tenant, organization
 
-## Data Governance & Privacy
-- **Audit Log**: An append-only, tamper-evident log capturing entity mutations (`CREATE`, `UPDATE`, `DELETE`, `OUTCOME_CHANGE`, `INVENTORY_ADJUSTMENT`, `GDPR_ERASURE`).
-- **Tombstoning**: Replacing personal identifiable information with `[GDPR ERASURE VERIFIED]` while preserving log structure and referential integrity.
+**Shelter Context**:
+The active shelter scope currently selected by the operator to isolate all data views, searches, and operations.
+_Avoid_: Active workspace, session shelter, active profile
+
+### Pet Demographics & Status
+
+**Pet Profile**:
+The authoritative demographic and medical record for an animal managed by a shelter.
+_Avoid_: Animal record, patient file, pet entry
+
+**Intake Origin**:
+The recorded source or circumstance through which an animal entered the shelter.
+_Avoid_: Arrival source, intake method, acquisition type
+
+**Estimated Date of Birth**:
+An approximate birth date recorded for an animal whose exact birthdate is unknown.
+_Avoid_: Approximate age, guessed birthday
+
+**Available for Adoption**:
+A boolean status designating whether an active animal is eligible for public adoption consideration.
+_Avoid_: Adoptable, listed, public flag
+
+**In Foster**:
+A non-terminal, reversible placement status where an animal temporarily resides with an external caretaker while remaining under shelter responsibility.
+_Avoid_: Fostered, temporary placement, offsite pet
+
+**Archived Pet**:
+A pet profile transitioned to a permanent historical state following a terminal outcome (Adopted, Deceased, or Transferred External).
+_Avoid_: Inactive pet, closed pet, deleted pet
+
+**Adopted**:
+A terminal pet outcome indicating that legal custody and care of the animal have been permanently transferred to an adopter.
+_Avoid_: Rehomed, placed
+
+**Deceased**:
+A terminal pet outcome indicating that the animal has died.
+_Avoid_: Dead, expired, terminated
+
+**Transferred (External)**:
+A terminal pet outcome where an animal is permanently relocated to an external organization outside the system.
+_Avoid_: Out-transferred, external relocation
+
+**Adopter**:
+The individual who assumes permanent custody of an adopted animal, whose contact details are recorded upon adoption.
+_Avoid_: Owner, buyer, client, customer
+
+### Veterinary Care & Directory
+
+**Veterinary Directory**:
+A shelter-scoped registry of external veterinary clinics and affiliated veterinary professionals.
+_Avoid_: Vet list, doctor address book, clinic catalog
+
+**Veterinary Clinic**:
+An external medical facility or hospital registered in the veterinary directory that provides clinical services to shelter animals.
+_Avoid_: Hospital, vet office, practice, partner clinic
+
+**Veterinarian**:
+A licensed medical professional registered within the veterinary directory and linked to a specific clinic.
+_Avoid_: Vet doctor, medical professional, practitioner
+
+**Veterinary Appointment**:
+A scheduled or historical clinical visit for a pet conducted by a specific veterinarian at a veterinary clinic.
+_Avoid_: Vet visit, medical consultation, booking
+
+**Veterinary Document**:
+A clinical file or diagnostic attachment associated with a veterinary appointment.
+_Avoid_: Medical attachment, clinical file, exam paper
+
+### Care & Treatment
+
+**Care Event**:
+A discrete scheduled or administered health procedure, treatment, or wellness action for a pet.
+_Avoid_: Task, treatment log, medical action
+
+**Modality**:
+The clinical category of a care event, such as Vaccine, Vermifuge, Medication, Physical Therapy, or Grooming.
+_Avoid_: Care type, treatment kind, intervention category
+
+**Substance**:
+The specific medication, vaccine, or therapeutic agent administered during a care event.
+_Avoid_: Medicine, medication name, drug product
+
+**Recurring Care Event**:
+A care event configured to repeat automatically at set intervals until explicitly cancelled or concluded.
+_Avoid_: Routine schedule, periodic treatment
+
+**Temporary Care Event**:
+A time-bounded treatment course that automatically concludes after a specified end date.
+_Avoid_: Acute treatment, finite prescription, temporary treatment
+
+### Extended Operations & Collaboration
+
+**Shadow Record**:
+A read-only historical copy of a pet record retained by the originating shelter after an internal transfer to another shelter.
+_Avoid_: Ghost profile, stub record, mirror pet
+
+**Shareable Link**:
+A time-limited, access-controlled web link providing external parties view-only access to a pet's adoption or veterinary profile.
+_Avoid_: Public link, guest token, shared URL
+
+**Inventory Item**:
+A tracked physical supply or consumable item managed within a shelter by quantity, unit of measure, and expiration date.
+_Avoid_: Stock item, product, consumable
+
+**Maintenance Task**:
+A scheduled facility upkeep, cleaning, or repair activity within a shelter.
+_Avoid_: Chore, shelter task, repair job

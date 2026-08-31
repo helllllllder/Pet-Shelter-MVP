@@ -1,8 +1,8 @@
 # Requirements Traceability Matrix: Luna's Pet Central
 
-**Version**: 3.3
-**Date**: 2026-08-28
-**Source Documents**: BRD v3.1, PRD v3.1
+**Version**: 3.4
+**Date**: 2026-08-30
+**Source Documents**: BRD v3.3, PRD v3.3
 
 ---
 
@@ -14,6 +14,7 @@
 | 3.1 | Antigravity AI Architect | 2026-08-30 | Updated to reflect atomic requirement refinement — all FR IDs split into sub-IDs (FR01-A through FR36), NFR16 split into NFR16-A/NFR16-B. FR count synced from 40 to 52. All 7 mapping sections updated. |
 | 3.2 | Antigravity AI Architect | 2026-08-30 | Gap review and fix — added 5 missing edge cases (FR06, FR17, FR22-B, FR23-B, FR24), added 3 missing past-date edge cases (FR15-A, FR19-A, FR22-A), added 20 explicit "No state machine" entries for utility/reference FRs, added FR25-B to Process Flow and KPI sections, added 3 test cases for new edge cases. All 7 sections now contain all 73 atomic FRs. |
 | 3.3 | Antigravity AI Architect | 2026-08-30 | Gap review and reconciliation — added 11 new CRUD FRs (FR07-B, FR11-D–G, FR12-C, FR15-D–E, FR19-C, FR22-C–D) across all 7 sections; fixed duplicate FR24 state machine entry; added missing 'No state machine' entries for FR01-A/B/C, FR02-A/B, FR04, FR06, FR07; corrected FR count; fixed NFR16-A mapping rationale for FR08-A/B. |
+| 3.4 | Antigravity AI Architect | 2026-08-30 | Aligned Phase 1 (MVP) scope with MVP.md: promoted Pet Search & Filter (FR30-A) and Per-shelter Dashboard Overview (FR31) to Phase 1 (MVP); moved Local Shelter Deletion/Close (FR02-C) and Data Export (FR03-A/B) to Phase 2 (Operational Enrichment); updated Section 1 backup rationale for FR03-A. |
 
 ---
 
@@ -29,7 +30,7 @@ This table maps each Functional Requirement to the Non-Functional Requirements t
 | FR02-A | Local shelter creation | NFR01 (Usability), NFR08 (Data Isolation) | Shelter creation must be straightforward (usability). Each shelter is an independent data container with enforced isolation (data isolation). |
 | FR02-B | Local shelter edit | NFR01 (Usability) | Shelter edits must be straightforward (usability). |
 | FR02-C | Local shelter deletion/close | NFR01 (Usability), NFR08 (Data Isolation) | Closure requires all pets resolved (data isolation enforcement). Process must be clear and safe (usability). |
-| FR03-A | Local data export for a single shelter | NFR01 (Usability), NFR15 (Backup & DR) | Export must be easy to initiate (usability). Export serves as the Phase 1 backup mechanism (backup & DR). |
+| FR03-A | Local data export for a single shelter | NFR01 (Usability), NFR15 (Backup & DR) | Export must be easy to initiate (usability). Export serves as the Phase 2 backup mechanism (backup & DR). |
 | FR03-B | Local data export for all shelters | NFR01 (Usability), NFR15 (Backup & DR) | All-shelter export must be easy to initiate (usability). Serves as comprehensive backup. |
 | FR04 | Single-user shelter context switching | NFR01 (Usability), NFR02 (Performance), NFR08 (Data Isolation) | Context switching must be fast and intuitive (usability, performance). Switching enforces data isolation between shelters. |
 | FR05-A | Pet profile creation | NFR01 (Usability), NFR02 (Performance), NFR07 (Access Control), NFR08 (Data Isolation), NFR09 (Medical Privacy), NFR13 (Audit Logging), NFR17 (Global Search) | Pet registration must be completable in < 5 clicks (usability). Profile pages must load in < 2s (performance). Health data is private (medical privacy). Records are shelter-scoped (data isolation), access-controlled, and searchable via global search. Creation is audited. |
