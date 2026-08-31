@@ -2,8 +2,26 @@ import React from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useShelterStore } from "../stores/shelter-store.js";
 
-export const DashboardScreen: React.FC = () => {
+export interface DashboardOverviewData {
+  totalActivePets?: number;
+  petsInTreatment?: number;
+  petsInFoster?: number;
+  dueCareEvents?: number;
+  overdueCareEvents?: number;
+}
+
+export interface DashboardScreenProps {
+  overview?: DashboardOverviewData;
+}
+
+export const DashboardScreen: React.FC<DashboardScreenProps> = ({ overview }) => {
   const activeShelter = useShelterStore((state) => state.getActiveShelter());
+
+  const totalActivePets = overview?.totalActivePets ?? 0;
+  const petsInTreatment = overview?.petsInTreatment ?? 0;
+  const petsInFoster = overview?.petsInFoster ?? 0;
+  const dueCareEvents = overview?.dueCareEvents ?? 0;
+  const overdueCareEvents = overview?.overdueCareEvents ?? 0;
 
   return (
     <ScrollView style={styles.container}>
@@ -16,20 +34,24 @@ export const DashboardScreen: React.FC = () => {
 
       <View style={styles.grid}>
         <View style={[styles.kpiCard, { borderLeftColor: "#3b82f6" }]}>
-          <Text style={styles.kpiValue}>0</Text>
+          <Text style={styles.kpiValue}>{totalActivePets}</Text>
           <Text style={styles.kpiLabel}>Total Active Pets</Text>
         </View>
         <View style={[styles.kpiCard, { borderLeftColor: "#10b981" }]}>
-          <Text style={styles.kpiValue}>0</Text>
+          <Text style={styles.kpiValue}>{petsInTreatment}</Text>
           <Text style={styles.kpiLabel}>Pets in Treatment</Text>
         </View>
         <View style={[styles.kpiCard, { borderLeftColor: "#f59e0b" }]}>
-          <Text style={styles.kpiValue}>0</Text>
+          <Text style={styles.kpiValue}>{petsInFoster}</Text>
           <Text style={styles.kpiLabel}>In Foster</Text>
         </View>
-        <View style={[styles.kpiCard, { borderLeftColor: "#ef4444" }]}>
-          <Text style={styles.kpiValue}>0</Text>
+        <View style={[styles.kpiCard, { borderLeftColor: "#6366f1" }]}>
+          <Text style={styles.kpiValue}>{dueCareEvents}</Text>
           <Text style={styles.kpiLabel}>Due Care Events</Text>
+        </View>
+        <View style={[styles.kpiCard, { borderLeftColor: "#ef4444" }]}>
+          <Text style={styles.kpiValue}>{overdueCareEvents}</Text>
+          <Text style={styles.kpiLabel}>Overdue Care Events</Text>
         </View>
       </View>
     </ScrollView>
