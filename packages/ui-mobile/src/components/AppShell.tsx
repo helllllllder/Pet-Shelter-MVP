@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { ShelterHeader } from "./ShelterHeader.js";
-import { ShelterSwitcherModal } from "./ShelterSwitcherModal.js";
-import { DrawerContent } from "./DrawerContent.js";
-import { NAVIGATION_ROUTES } from "../navigation.js";
-import { DashboardScreen } from "../screens/DashboardScreen.js";
-import { PetsListScreen } from "../screens/PetsListScreen.js";
-import { PetDetailScreen } from "../screens/PetDetailScreen.js";
-import { PetRegisterScreen } from "../screens/PetRegisterScreen.js";
-import { VetDirectoryScreen } from "../screens/VetDirectoryScreen.js";
-import { CareScheduleScreen } from "../screens/CareScheduleScreen.js";
-import { ProfileScreen } from "../screens/ProfileScreen.js";
+import { ShelterHeader } from "./ShelterHeader";
+import { ShelterSwitcherModal } from "./ShelterSwitcherModal";
+import { DrawerContent } from "./DrawerContent";
+import { NAVIGATION_ROUTES } from "../navigation";
+import { DashboardScreen } from "../screens/DashboardScreen";
+import { PetsListScreen } from "../screens/PetsListScreen";
+import { PetDetailScreen } from "../screens/PetDetailScreen";
+import { PetRegisterScreen } from "../screens/PetRegisterScreen";
+import { VetDirectoryScreen } from "../screens/VetDirectoryScreen";
+import { CareScheduleScreen } from "../screens/CareScheduleScreen";
+import { ProfileScreen } from "../screens/ProfileScreen";
 
 export interface AppShellProps {
   initialRoute?: string;
