@@ -87,7 +87,7 @@ export interface AdopterDetails {
 export type CareModality = 'Vaccine' | 'Vermifuge' | 'Medication' | 'PhysicalTherapy' | 'Grooming';
 export type RecurrenceUnit = 'hours' | 'days' | 'months' | 'years';
 export type CareEventStatus = 'Pending' | 'Due' | 'Overdue' | 'Completed' | 'Cancelled';
-export type CareOccurrenceStatus = 'Pending' | 'Completed' | 'Cancelled';
+export type CareOccurrenceStatus = 'Pending' | 'Completed' | 'Skipped' | 'Cancelled';
 
 export interface RecurrenceRule {
   interval: number;
@@ -102,6 +102,8 @@ export interface CareEvent {
   substance?: string;
   instructions?: string;
   recurrenceRule?: RecurrenceRule;
+  dueDate?: string;
+  startDate?: string;
   temporaryEndDate?: string;
   appointmentId?: string;
   status: CareEventStatus;
@@ -320,6 +322,12 @@ export interface ShelterAppFacade {
   // Care events
   createCareEvent(shelterId: string, data: Omit<CareEvent, 'id' | 'shelterId' | 'status' | 'createdAt' | 'updatedAt'>): Promise<CareEvent>;
   listCareEvents(petId: string, shelterId: string): Promise<CareEvent[]>;
+  completeCareOccurrence?(shelterId: string, occurrenceId: string, completedAt?: string, notes?: string): Promise<CareOccurrence>;
+  skipCareOccurrence?(shelterId: string, occurrenceId: string, notes?: string): Promise<CareOccurrence>;
+  cancelCareEvent?(shelterId: string, careEventId: string): Promise<number>;
+  cancelCareOccurrence?(shelterId: string, occurrenceId: string): Promise<CareOccurrence>;
+  listCareOccurrences?(petId: string, shelterId: string): Promise<CareOccurrence[]>;
+  listDueCareOccurrences?(shelterId: string, beforeDate?: string): Promise<CareOccurrence[]>;
 
   // Dashboard
   getDashboardOverview(shelterId: string): Promise<{
