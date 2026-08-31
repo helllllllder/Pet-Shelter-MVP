@@ -14,12 +14,14 @@ import type {
 } from "../../contracts/src/index.js";
 import { PetService } from "./pet-service.js";
 import { PetLifecycleService } from "./pet-lifecycle-service.js";
+import { DashboardService } from "./dashboard-service.js";
 import type { SqliteRepositoryFactory } from "../../adapter-sqlite/src/index.js";
 import { generateUUIDv7 } from "../../domain/src/index.js";
 
 export class ShelterAppFacadeImpl implements ShelterAppFacade {
   private readonly petService: PetService;
   private readonly lifecycleService: PetLifecycleService;
+  private readonly dashboardService: DashboardService;
 
   constructor(private readonly factory: SqliteRepositoryFactory) {
     this.petService = new PetService(
@@ -30,6 +32,10 @@ export class ShelterAppFacadeImpl implements ShelterAppFacade {
       this.factory.petRepo,
       this.factory.careEventRepo,
       this.factory.auditLogRepo
+    );
+    this.dashboardService = new DashboardService(
+      this.factory.petRepo,
+      this.factory.careEventRepo
     );
   }
 
@@ -358,30 +364,7 @@ export class ShelterAppFacadeImpl implements ShelterAppFacade {
     dueCareEvents: number;
     overdueCareEvents: number;
   }> {
-    const pets = await this.factory.petRepo.search(shelterId);
-    const activePets = pets.filter((p) => !p.isArchived);
-    const inTreatment = activePets.filter(
-      (p) => p.healthStatus === "In Treatment" || (p.healthStatus as string) === "InTreatment"
-    ).length;
-    const inFoster = activePets.filter((p) => p.outcomeStatus === "In Foster").length;
-
-    const now = new Date();
-    const dueOccurrences = await this.factory.careEventRepo.listDueOccurrences(
-      shelterId,
-      now.toISOString()
-    );
-
-    const overdueOccurrences = dueOccurrences.filter(
-      (o) => new Date(o.dueDate).getTime() < now.getTime() - 24 * 60 * 60 * 1000
-    );
-
-    return {
-      totalActivePets: activePets.length,
-      petsInTreatment: inTreatment,
-      petsInFoster: inFoster,
-      dueCareEvents: dueOccurrences.length,
-      overdueCareEvents: overdueOccurrences.length,
-    };
+    return this.dashboardService.getOverview(shelterId);
   }
 
   // Mappers
