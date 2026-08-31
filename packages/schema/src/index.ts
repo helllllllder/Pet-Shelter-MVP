@@ -52,12 +52,12 @@ export const UUIDv7Schema = z.string().regex(UUIDv7Regex, 'Must be a valid UUIDv
 
 export const OperatorCreateSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Must be a valid email address').lowercase(),
+  email: z.string().email('Must be a valid email address').toLowerCase(),
 });
 
 export const OperatorUpdateSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').optional(),
-  email: z.string().email('Must be a valid email address').lowercase().optional(),
+  email: z.string().email('Must be a valid email address').toLowerCase().optional(),
 });
 
 // ─── Shelter ──────────────────────────────────────────────────────────────────
