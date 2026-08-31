@@ -10,6 +10,8 @@ import {
   Alert,
 } from "react-native";
 import { usePetStore } from "../stores/pet-store";
+import { useCareStore, type CareOccurrenceItem } from "../stores/care-store";
+import { AddCareEventModal } from "../components/AddCareEventModal";
 
 export interface PetDetailScreenProps {
   petId?: string;
@@ -24,7 +26,17 @@ export const PetDetailScreen: React.FC<PetDetailScreenProps> = ({
   const pet = usePetStore((state) => (selectedId ? state.getPetById(selectedId) : null));
   const updatePet = usePetStore((state) => state.updatePet);
 
-  // Adoption modal state
+  // Care store
+  const allOccurrences = useCareStore((state) => state.occurrences);
+  const completeOccurrence = useCareStore((state) => state.completeOccurrence);
+  const skipOccurrence = useCareStore((state) => state.skipOccurrence);
+
+  const petOccurrences = pet
+    ? allOccurrences.filter((occ) => occ.petId === pet.id)
+    : [];
+
+  // Modals state
+  const [addCareModalVisible, setAddCareModalVisible] = useState(false);
   const [adoptionModalVisible, setAdoptionModalVisible] = useState(false);
   const [adopterName, setAdopterName] = useState("");
   const [adopterPhone, setAdopterPhone] = useState("");
@@ -72,6 +84,16 @@ export const PetDetailScreen: React.FC<PetDetailScreenProps> = ({
 
     setAdoptionModalVisible(false);
     Alert.alert("Adoption Finalized 🎉", `${pet.name} is officially adopted!`);
+  };
+
+  const handleCompleteCare = (occ: CareOccurrenceItem) => {
+    completeOccurrence(occ.id, "Administered at shelter");
+    Alert.alert("Care Completed ✓", `${occ.substance} administered to ${pet.name}.`);
+  };
+
+  const handleSkipCare = (occ: CareOccurrenceItem) => {
+    skipOccurrence(occ.id, "Skipped by shelter staff");
+    Alert.alert("Care Skipped ✕", `${occ.substance} skipped for ${pet.name}.`);
   };
 
   return (
@@ -145,6 +167,85 @@ export const PetDetailScreen: React.FC<PetDetailScreenProps> = ({
         </View>
       </View>
 
+      {/* Care Schedule & Medical Events Section */}
+      <View style={styles.sectionCard}>
+        <View style={styles.careSectionHeader}>
+          <Text style={styles.sectionTitle}>Medical & Care Schedule ({petOccurrences.length})</Text>
+          {pet.status !== "archived" && (
+            <TouchableOpacity
+              style={styles.addCareBtn}
+              onPress={() => setAddCareModalVisible(true)}
+            >
+              <Text style={styles.addCareBtnText}>+ Add Care</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {petOccurrences.length === 0 ? (
+          <Text style={styles.noCareText}>
+            No medical treatments, vaccines, or care events recorded for {pet.name}.
+          </Text>
+        ) : (
+          petOccurrences.map((occ) => {
+            const statusColor =
+              occ.status === "completed"
+                ? "#16a34a"
+                : occ.status === "skipped"
+                ? "#6b7280"
+                : occ.status === "overdue"
+                ? "#dc2626"
+                : "#2563eb";
+
+            const modalityIcon =
+              occ.modality === "Vaccine"
+                ? "💉"
+                : occ.modality === "Medication"
+                ? "💊"
+                : occ.modality === "Vermifuge"
+                ? "🪱"
+                : occ.modality === "Grooming"
+                ? "✂️"
+                : "🏃";
+
+            return (
+              <View key={occ.id} style={styles.careOccurrenceCard}>
+                <View style={styles.careHeaderRow}>
+                  <View style={styles.careTitleRow}>
+                    <Text style={styles.careIcon}>{modalityIcon}</Text>
+                    <View>
+                      <Text style={styles.careSubstance}>{occ.substance}</Text>
+                      <Text style={styles.careDueDate}>📅 Due: {occ.dueDate}</Text>
+                    </View>
+                  </View>
+                  <View style={[styles.statusBadge, { backgroundColor: statusColor + "15" }]}>
+                    <Text style={[styles.statusBadgeText, { color: statusColor }]}>
+                      {occ.status.toUpperCase()}
+                    </Text>
+                  </View>
+                </View>
+
+                {occ.status === "scheduled" && (
+                  <View style={styles.careActionRow}>
+                    <TouchableOpacity
+                      style={styles.careCompleteBtn}
+                      onPress={() => handleCompleteCare(occ)}
+                    >
+                      <Text style={styles.careCompleteBtnText}>✓ Complete</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.careSkipBtn}
+                      onPress={() => handleSkipCare(occ)}
+                    >
+                      <Text style={styles.careSkipBtnText}>✕ Skip</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+            );
+          })
+        )}
+      </View>
+
       {/* Adopter info if adopted */}
       {pet.adopter && (
         <View style={[styles.sectionCard, { backgroundColor: "#f0fdf4" }]}>
@@ -195,6 +296,13 @@ export const PetDetailScreen: React.FC<PetDetailScreenProps> = ({
           </TouchableOpacity>
         </View>
       )}
+
+      {/* Add Care Modal */}
+      <AddCareEventModal
+        visible={addCareModalVisible}
+        petId={pet.id}
+        onClose={() => setAddCareModalVisible(false)}
+      />
 
       {/* Adoption Modal */}
       <Modal
@@ -335,7 +443,100 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "bold",
     color: "#111827",
+  },
+  careSectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 12,
+  },
+  addCareBtn: {
+    backgroundColor: "#eff6ff",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+    borderColor: "#bfdbfe",
+    borderWidth: 1,
+  },
+  addCareBtnText: {
+    color: "#1d4ed8",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  noCareText: {
+    fontSize: 13,
+    color: "#9ca3af",
+    fontStyle: "italic",
+    paddingVertical: 6,
+  },
+  careOccurrenceCard: {
+    backgroundColor: "#f9fafb",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#f3f4f6",
+  },
+  careHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  careTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  careIcon: {
+    fontSize: 18,
+    marginRight: 8,
+  },
+  careSubstance: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#111827",
+  },
+  careDueDate: {
+    fontSize: 11,
+    color: "#6b7280",
+    marginTop: 1,
+  },
+  statusBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  statusBadgeText: {
+    fontSize: 10,
+    fontWeight: "bold",
+  },
+  careActionRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 8,
+  },
+  careCompleteBtn: {
+    flex: 1,
+    backgroundColor: "#16a34a",
+    paddingVertical: 6,
+    borderRadius: 4,
+    alignItems: "center",
+  },
+  careCompleteBtnText: {
+    color: "#ffffff",
+    fontSize: 11,
+    fontWeight: "bold",
+  },
+  careSkipBtn: {
+    flex: 1,
+    backgroundColor: "#e5e7eb",
+    paddingVertical: 6,
+    borderRadius: 4,
+    alignItems: "center",
+  },
+  careSkipBtnText: {
+    color: "#374151",
+    fontSize: 11,
+    fontWeight: "600",
   },
   row: {
     flexDirection: "row",
