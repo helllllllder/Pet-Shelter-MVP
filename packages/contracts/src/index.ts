@@ -294,13 +294,28 @@ export interface ShelterAppFacade {
 
   // Vet directory
   createClinic(shelterId: string, data: { name: string; address?: string; phone?: string; email?: string }): Promise<VeterinaryClinic>;
+  updateClinic?(shelterId: string, clinicId: string, data: Partial<{ name: string; address?: string; phone?: string; email?: string }>): Promise<VeterinaryClinic>;
+  getClinic?(shelterId: string, clinicId: string): Promise<VeterinaryClinic | null>;
   listClinics(shelterId: string, search?: string): Promise<VeterinaryClinic[]>;
+  deleteClinic?(shelterId: string, clinicId: string): Promise<boolean>;
+
   createVet(shelterId: string, data: { clinicId: string; name: string; specialization?: string; phone?: string; email?: string }): Promise<Veterinarian>;
+  updateVet?(shelterId: string, vetId: string, data: Partial<{ name: string; specialization?: string; phone?: string; email?: string }>): Promise<Veterinarian>;
+  getVet?(shelterId: string, vetId: string): Promise<Veterinarian | null>;
   listVets(shelterId: string, clinicId?: string): Promise<Veterinarian[]>;
+  deleteVet?(shelterId: string, vetId: string): Promise<boolean>;
 
   // Appointments
   createAppointment(shelterId: string, data: Omit<VetAppointment, 'id' | 'shelterId' | 'isRetroactive' | 'createdAt' | 'updatedAt'>): Promise<VetAppointment>;
+  updateAppointment?(shelterId: string, appointmentId: string, data: Partial<Omit<VetAppointment, 'id' | 'shelterId' | 'createdAt' | 'updatedAt'>>): Promise<VetAppointment>;
+  getAppointment?(shelterId: string, appointmentId: string): Promise<VetAppointment | null>;
   listAppointments(petId: string, shelterId: string): Promise<VetAppointment[]>;
+  deleteAppointment?(shelterId: string, appointmentId: string): Promise<boolean>;
+
+  // Medical documents
+  uploadAppointmentDocument?(shelterId: string, appointmentId: string, file: { fileName: string; mimeType: string; fileSizeBytes: number; buffer: Buffer }): Promise<VetDocument>;
+  listAppointmentDocuments?(shelterId: string, appointmentId: string): Promise<VetDocument[]>;
+  deleteAppointmentDocument?(shelterId: string, appointmentId: string, documentId: string): Promise<boolean>;
 
   // Care events
   createCareEvent(shelterId: string, data: Omit<CareEvent, 'id' | 'shelterId' | 'status' | 'createdAt' | 'updatedAt'>): Promise<CareEvent>;

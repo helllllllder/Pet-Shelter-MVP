@@ -9,12 +9,14 @@ import type {
   VeterinaryClinic,
   Veterinarian,
   VetAppointment,
+  VetDocument,
   CareEvent,
   CareEventStatus,
 } from "../../contracts/src/index.js";
 import { PetService } from "./pet-service.js";
 import { PetLifecycleService } from "./pet-lifecycle-service.js";
 import { DashboardService } from "./dashboard-service.js";
+import { VeterinaryService } from "./veterinary-service.js";
 import type { SqliteRepositoryFactory } from "../../adapter-sqlite/src/index.js";
 import { generateUUIDv7 } from "../../domain/src/index.js";
 
@@ -22,6 +24,7 @@ export class ShelterAppFacadeImpl implements ShelterAppFacade {
   private readonly petService: PetService;
   private readonly lifecycleService: PetLifecycleService;
   private readonly dashboardService: DashboardService;
+  private readonly vetService: VeterinaryService;
 
   constructor(private readonly factory: SqliteRepositoryFactory) {
     this.petService = new PetService(
@@ -36,6 +39,11 @@ export class ShelterAppFacadeImpl implements ShelterAppFacade {
     this.dashboardService = new DashboardService(
       this.factory.petRepo,
       this.factory.careEventRepo
+    );
+    this.vetService = new VeterinaryService(
+      this.factory.vetDirectoryRepo,
+      this.factory.appointmentRepo,
+      this.factory.auditLogRepo
     );
   }
 
@@ -254,47 +262,66 @@ export class ShelterAppFacadeImpl implements ShelterAppFacade {
     shelterId: string,
     data: { name: string; address?: string; phone?: string; email?: string }
   ): Promise<VeterinaryClinic> {
-    const id = generateUUIDv7();
-    const clinic = await this.factory.vetDirectoryRepo.createClinic({
-      id,
-      shelterId,
-      name: data.name,
-      address: data.address || null,
-      phone: data.phone || null,
-      email: data.email || null,
-    });
+    const clinic = await this.vetService.createClinic(shelterId, data);
+    return this.mapClinic(clinic);
+  }
+
+  async updateClinic(
+    shelterId: string,
+    clinicId: string,
+    data: Partial<{ name: string; address?: string; phone?: string; email?: string }>
+  ): Promise<VeterinaryClinic> {
+    const updated = await this.vetService.updateClinic(shelterId, clinicId, data);
+    return this.mapClinic(updated);
+  }
+
+  async getClinic(shelterId: string, clinicId: string): Promise<VeterinaryClinic | null> {
+    const clinic = await this.vetService.getClinic(shelterId, clinicId);
+    if (!clinic) return null;
     return this.mapClinic(clinic);
   }
 
   async listClinics(shelterId: string, search?: string): Promise<VeterinaryClinic[]> {
-    const list = search
-      ? await this.factory.vetDirectoryRepo.searchClinics(shelterId, search)
-      : await this.factory.vetDirectoryRepo.listClinics(shelterId);
+    const list = await this.vetService.listClinics(shelterId, search);
     return list.map((c) => this.mapClinic(c));
+  }
+
+  async deleteClinic(shelterId: string, clinicId: string): Promise<boolean> {
+    return this.vetService.deleteClinic(shelterId, clinicId);
   }
 
   async createVet(
     shelterId: string,
     data: { clinicId: string; name: string; specialization?: string; phone?: string; email?: string }
   ): Promise<Veterinarian> {
-    const id = generateUUIDv7();
-    const vet = await this.factory.vetDirectoryRepo.createVeterinarian({
-      id,
-      shelterId,
-      clinicId: data.clinicId,
-      name: data.name,
-      specialization: data.specialization || null,
-      phone: data.phone || null,
-      email: data.email || null,
-    });
+    const vet = await this.vetService.createVeterinarian(shelterId, data);
+    return this.mapVet(vet);
+  }
+
+  async updateVet(
+    shelterId: string,
+    vetId: string,
+    data: Partial<{ name: string; specialization?: string; phone?: string; email?: string }>
+  ): Promise<Veterinarian> {
+    const updated = await this.vetService.updateVeterinarian(shelterId, vetId, data);
+    return this.mapVet(updated);
+  }
+
+  async getVet(shelterId: string, vetId: string): Promise<Veterinarian | null> {
+    const vet = await this.vetService.getVeterinarian(shelterId, vetId);
+    if (!vet) return null;
     return this.mapVet(vet);
   }
 
   async listVets(shelterId: string, clinicId?: string): Promise<Veterinarian[]> {
     const list = clinicId
-      ? await this.factory.vetDirectoryRepo.listVeterinariansByClinic(clinicId, shelterId)
+      ? await this.vetService.listVeterinariansByClinic(shelterId, clinicId)
       : [];
     return list.map((v) => this.mapVet(v));
+  }
+
+  async deleteVet(shelterId: string, vetId: string): Promise<boolean> {
+    return this.vetService.deleteVeterinarian(shelterId, vetId);
   }
 
   // Appointments
@@ -302,24 +329,72 @@ export class ShelterAppFacadeImpl implements ShelterAppFacade {
     shelterId: string,
     data: Omit<VetAppointment, "id" | "shelterId" | "isRetroactive" | "createdAt" | "updatedAt">
   ): Promise<VetAppointment> {
-    const id = generateUUIDv7();
-    const scheduledAt = data.scheduledAt;
-    const appt = await this.factory.appointmentRepo.create({
-      id,
-      shelterId,
+    const appt = await this.vetService.createAppointment(shelterId, {
       petId: data.petId,
       clinicId: data.clinicId,
-      veterinarianId: data.veterinarianId || null,
-      appointmentDate: scheduledAt,
-      isRetroactive: new Date(scheduledAt) < new Date(),
-      notes: data.notes || "",
+      veterinarianId: data.veterinarianId,
+      appointmentDate: data.scheduledAt,
+      notes: data.notes,
     });
     return this.mapAppointment(appt);
   }
 
+  async updateAppointment(
+    shelterId: string,
+    appointmentId: string,
+    data: Partial<Omit<VetAppointment, "id" | "shelterId" | "createdAt" | "updatedAt">>
+  ): Promise<VetAppointment> {
+    const updated = await this.vetService.updateAppointment(shelterId, appointmentId, {
+      clinicId: data.clinicId,
+      veterinarianId: data.veterinarianId,
+      appointmentDate: data.scheduledAt,
+      notes: data.notes,
+    });
+    return this.mapAppointment(updated);
+  }
+
+  async getAppointment(
+    shelterId: string,
+    appointmentId: string
+  ): Promise<VetAppointment | null> {
+    const appt = await this.vetService.getAppointment(shelterId, appointmentId);
+    if (!appt) return null;
+    return this.mapAppointment(appt);
+  }
+
   async listAppointments(petId: string, shelterId: string): Promise<VetAppointment[]> {
-    const list = await this.factory.appointmentRepo.listByPet(petId, shelterId);
+    const list = await this.vetService.listAppointmentsByPet(shelterId, petId);
     return list.map((a) => this.mapAppointment(a));
+  }
+
+  async deleteAppointment(shelterId: string, appointmentId: string): Promise<boolean> {
+    return this.vetService.deleteAppointment(shelterId, appointmentId);
+  }
+
+  // Medical documents
+  async uploadAppointmentDocument(
+    shelterId: string,
+    appointmentId: string,
+    file: { fileName: string; mimeType: string; fileSizeBytes: number; buffer: Buffer }
+  ): Promise<VetDocument> {
+    const doc = await this.vetService.uploadAppointmentDocument(shelterId, appointmentId, file);
+    return this.mapDocument(doc);
+  }
+
+  async listAppointmentDocuments(
+    shelterId: string,
+    appointmentId: string
+  ): Promise<VetDocument[]> {
+    const docs = await this.vetService.listAppointmentDocuments(shelterId, appointmentId);
+    return docs.map((d) => this.mapDocument(d));
+  }
+
+  async deleteAppointmentDocument(
+    shelterId: string,
+    appointmentId: string,
+    documentId: string
+  ): Promise<boolean> {
+    return this.vetService.deleteAppointmentDocument(shelterId, appointmentId, documentId);
   }
 
   // Care events
@@ -431,6 +506,19 @@ export class ShelterAppFacadeImpl implements ShelterAppFacade {
       notes: appt.notes || undefined,
       createdAt: appt.createdAt,
       updatedAt: appt.updatedAt,
+    };
+  }
+
+  private mapDocument(doc: any): VetDocument {
+    return {
+      id: doc.id,
+      shelterId: doc.shelterId,
+      appointmentId: doc.appointmentId,
+      fileName: doc.fileName,
+      filePath: doc.filePath,
+      mimeType: doc.mimeType,
+      fileSizeBytes: doc.fileSizeBytes,
+      createdAt: doc.createdAt,
     };
   }
 
