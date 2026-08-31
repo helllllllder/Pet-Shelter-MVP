@@ -149,6 +149,10 @@ export class PetService {
       throw new Error("Pet name cannot be empty");
     }
 
+    if (existing.isArchived && input.availableForAdoption === true) {
+      throw new Error("Cannot mark an archived pet as available for adoption");
+    }
+
     const updated = await this.petRepo.update({
       id,
       shelterId,
