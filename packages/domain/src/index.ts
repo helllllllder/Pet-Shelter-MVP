@@ -1,8 +1,9 @@
-export * from './uuid';
-export * from './pet-lifecycle';
-export * from './entities/operator';
-export * from './entities/shelter';
-export * from './entities/pet';
-export * from './entities/media-asset';
-export * from './entities/veterinary';
-export * from './entities/care-event';
+export * from './uuid.js';
+export * from './pet-lifecycle.js';
+export * from './entities/operator.js';
+export * from './entities/shelter.js';
+export * from './entities/pet.js';
+export * from './entities/media-asset.js';
+export * from './entities/veterinary.js';
+export * from './entities/care-event.js';
+
