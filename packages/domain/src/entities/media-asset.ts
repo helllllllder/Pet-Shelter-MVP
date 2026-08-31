@@ -1,4 +1,4 @@
-import { generateUUIDv7 } from '../uuid';
+import { generateUUIDv7 } from '../uuid.js';
 
 export type MediaType = 'photo' | 'video';
 export type MimeType = 'image/jpeg' | 'image/png' | 'image/gif' | 'video/mp4' | 'video/quicktime';

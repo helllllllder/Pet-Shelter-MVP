@@ -279,7 +279,14 @@ export interface ShelterAppFacade {
   hardDeletePet(id: string, shelterId: string): Promise<void>;
 
   // Pet lifecycle
-  transitionPetOutcome(petId: string, shelterId: string, outcome: Pet['outcome']): Promise<Pet>;
+  transitionPetOutcome(
+    petId: string,
+    shelterId: string,
+    outcome: Pet['outcome'],
+    adopterDetails?: { name: string; phone: string; address: string }
+  ): Promise<Pet>;
+  placeInFoster?(petId: string, shelterId: string): Promise<Pet>;
+  returnFromFoster?(petId: string, shelterId: string): Promise<Pet>;
 
   // Media
   uploadPetMedia(shelterId: string, petId: string, file: { fileName: string; mimeType: MimeType; fileSizeBytes: number; buffer: Buffer }): Promise<MediaAsset>;
