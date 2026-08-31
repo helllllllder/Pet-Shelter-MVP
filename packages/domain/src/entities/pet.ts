@@ -1,5 +1,5 @@
-import { generateUUIDv7 } from '../uuid';
-import { PetStatus, PetOutcome } from '../pet-lifecycle';
+import { generateUUIDv7 } from '../uuid.js';
+import { PetStatus, PetOutcome } from '../pet-lifecycle.js';
 
 export type Species = 'Dog' | 'Cat' | 'Bird' | 'Rabbit' | 'Other';
 export type Sex = 'Male' | 'Female' | 'Unknown';

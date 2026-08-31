@@ -1,4 +1,4 @@
-import { generateUUIDv7 } from '../uuid';
+import { generateUUIDv7 } from '../uuid.js';
 
 export interface OperatorProfile {
   id: string;

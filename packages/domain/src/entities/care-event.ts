@@ -1,5 +1,5 @@
-import { generateUUIDv7 } from '../uuid';
-import { PetStatus } from '../pet-lifecycle';
+import { generateUUIDv7 } from '../uuid.js';
+import { PetStatus } from '../pet-lifecycle.js';
 
 export type CareModality = 'Vaccine' | 'Vermifuge' | 'Medication' | 'PhysicalTherapy' | 'Grooming';
 export type RecurrenceUnit = 'hours' | 'days' | 'months' | 'years';

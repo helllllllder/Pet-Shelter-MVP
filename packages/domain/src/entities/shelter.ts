@@ -1,4 +1,4 @@
-import { generateUUIDv7 } from '../uuid';
+import { generateUUIDv7 } from '../uuid.js';
 
 export interface Shelter {
   id: string;
@@ -20,9 +20,10 @@ export class Shelter {
   static create(name: string, description?: string): Shelter {
     const validated = Shelter.validate(name);
     const now = new Date();
+    const id = generateUUIDv7();
     return {
-      id: generateUUIDv7(),
-      shelterId: generateUUIDv7(),
+      id,
+      shelterId: id,
       name: validated.name,
       description: description?.trim() || undefined,
       createdAt: now,
