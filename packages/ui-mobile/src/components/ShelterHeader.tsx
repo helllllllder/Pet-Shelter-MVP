@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { useShelterStore } from "../stores/shelter-store.js";
+import { useShelterStore } from "../stores/shelter-store";
 
 export interface ShelterHeaderProps {
   onOpenSwitcher?: () => void;

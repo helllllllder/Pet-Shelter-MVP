@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { useOperatorStore } from "../stores/operator-store.js";
+import { useOperatorStore } from "../stores/operator-store";
 
 export const ProfileScreen: React.FC = () => {
   const profile = useOperatorStore((state) => state.profile);

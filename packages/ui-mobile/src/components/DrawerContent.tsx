@@ -1,8 +1,8 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
-import { NAVIGATION_ROUTES } from "../navigation.js";
-import { useShelterStore } from "../stores/shelter-store.js";
-import { useOperatorStore } from "../stores/operator-store.js";
+import { NAVIGATION_ROUTES } from "../navigation";
+import { useShelterStore } from "../stores/shelter-store";
+import { useOperatorStore } from "../stores/operator-store";
 
 export interface DrawerContentProps {
   currentRoute?: string;

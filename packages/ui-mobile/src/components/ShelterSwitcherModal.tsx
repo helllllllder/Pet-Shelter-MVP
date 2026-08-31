@@ -7,7 +7,7 @@ import {
   FlatList,
   StyleSheet,
 } from "react-native";
-import { useShelterStore, type ShelterItem } from "../stores/shelter-store.js";
+import { useShelterStore, type ShelterItem } from "../stores/shelter-store";
 
 export interface ShelterSwitcherModalProps {
   visible: boolean;

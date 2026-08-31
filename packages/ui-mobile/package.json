@@ -1,1 +1,28 @@
-{"name":"@luna/ui-mobile","version":"0.1.0","private":true,"type":"module","main":"./src/index.tsx","scripts":{"dev":"expo start","build":"tsc --noEmit","lint":"eslint src","typecheck":"tsc --noEmit","test":"vitest run"},"dependencies":{"@luna/app-core":"workspace:*","expo":"^52.0.0","expo-status-bar":"^2.0.0","react":"^18.3.1","react-native":"^0.76.6","@react-navigation/native":"^6.1.9","@react-navigation/drawer":"^6.6.15","zustand":"^5.0.2"},"devDependencies":{"@types/react":"^18.3.12","typescript":"^5.7.3","vitest":"^3.0.5"}}
+{
+  "name": "@luna/ui-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "dev": "expo start",
+    "build": "tsc --noEmit",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@luna/app-core": "workspace:*",
+    "expo": "^54.0.0",
+    "expo-status-bar": "^2.0.0",
+    "react": "^18.3.1",
+    "react-native": "^0.76.6",
+    "@react-navigation/native": "^6.1.9",
+    "@react-navigation/drawer": "^6.6.15",
+    "zustand": "^5.0.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
+  }
+}
