@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useShelterStore } from "../stores/shelter-store";
 import { usePetStore } from "../stores/pet-store";
+import { useCareStore } from "../stores/care-store";
 
 export interface DashboardOverviewData {
   totalActivePets?: number;
@@ -26,17 +27,34 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ overview }) =>
     ? allPets.filter((p) => p.shelterId === activeShelter.id)
     : [];
 
+  const allOccurrences = useCareStore((state) => state.occurrences);
+  const shelterOccurrences = activeShelter
+    ? allOccurrences.filter((occ) => occ.shelterId === activeShelter.id)
+    : [];
+
+  const todayStr = new Date().toISOString().split("T")[0];
+
   const activePets = pets.filter((p) => p.status === "active" || p.status === "in_foster");
   const inTreatmentPets = pets.filter(
     (p) => p.healthStatus === "InTreatment" && p.status !== "archived"
   );
   const inFosterPets = pets.filter((p) => p.status === "in_foster");
 
+  const calculatedDue = shelterOccurrences.filter(
+    (occ) => occ.status === "scheduled" && occ.dueDate >= todayStr
+  ).length;
+
+  const calculatedOverdue = shelterOccurrences.filter(
+    (occ) =>
+      occ.status === "overdue" ||
+      (occ.status === "scheduled" && occ.dueDate < todayStr)
+  ).length;
+
   const totalActivePets = overview?.totalActivePets ?? activePets.length;
   const petsInTreatment = overview?.petsInTreatment ?? inTreatmentPets.length;
   const petsInFoster = overview?.petsInFoster ?? inFosterPets.length;
-  const dueCareEvents = overview?.dueCareEvents ?? 0;
-  const overdueCareEvents = overview?.overdueCareEvents ?? 0;
+  const dueCareEvents = overview?.dueCareEvents ?? calculatedDue;
+  const overdueCareEvents = overview?.overdueCareEvents ?? calculatedOverdue;
 
   return (
     <ScrollView style={styles.container}>
