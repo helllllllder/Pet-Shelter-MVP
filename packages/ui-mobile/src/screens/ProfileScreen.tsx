@@ -11,7 +11,8 @@ import {
 import { useOperatorStore } from "../stores/operator-store";
 
 export const ProfileScreen: React.FC = () => {
-  const { profile, setProfile } = useOperatorStore();
+  const profile = useOperatorStore((state) => state.profile);
+  const setProfile = useOperatorStore((state) => state.setProfile);
 
   const [name, setName] = useState(profile?.name || "");
   const [email, setEmail] = useState(profile?.email || "");

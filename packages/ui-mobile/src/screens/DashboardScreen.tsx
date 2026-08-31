@@ -17,10 +17,14 @@ export interface DashboardScreenProps {
 }
 
 export const DashboardScreen: React.FC<DashboardScreenProps> = ({ overview }) => {
-  const activeShelter = useShelterStore((state) => state.getActiveShelter());
-  const pets = usePetStore((state) =>
-    activeShelter ? state.getPetsForShelter(activeShelter.id) : []
-  );
+  const shelters = useShelterStore((state) => state.shelters);
+  const activeShelterId = useShelterStore((state) => state.activeShelterId);
+  const activeShelter = shelters.find((s) => s.id === activeShelterId) ?? null;
+
+  const allPets = usePetStore((state) => state.pets);
+  const pets = activeShelter
+    ? allPets.filter((p) => p.shelterId === activeShelter.id)
+    : [];
 
   const activePets = pets.filter((p) => p.status === "active" || p.status === "in_foster");
   const inTreatmentPets = pets.filter(

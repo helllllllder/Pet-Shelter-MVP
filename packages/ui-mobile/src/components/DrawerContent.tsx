@@ -15,7 +15,10 @@ export const DrawerContent: React.FC<DrawerContentProps> = ({
   onNavigate,
   onOpenShelterSwitcher,
 }) => {
-  const activeShelter = useShelterStore((state) => state.getActiveShelter());
+  const shelters = useShelterStore((state) => state.shelters);
+  const activeShelterId = useShelterStore((state) => state.activeShelterId);
+  const activeShelter = shelters.find((s) => s.id === activeShelterId) ?? null;
+
   const operatorProfile = useOperatorStore((state) => state.profile);
 
   const menuItems = [

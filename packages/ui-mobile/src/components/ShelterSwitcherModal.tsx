@@ -20,7 +20,9 @@ export const ShelterSwitcherModal: React.FC<ShelterSwitcherModalProps> = ({
   onClose,
   onCreateNewShelter,
 }) => {
-  const { shelters, activeShelterId, setActiveShelter } = useShelterStore();
+  const shelters = useShelterStore((state) => state.shelters);
+  const activeShelterId = useShelterStore((state) => state.activeShelterId);
+  const setActiveShelter = useShelterStore((state) => state.setActiveShelter);
 
   const handleSelect = (shelterId: string) => {
     setActiveShelter(shelterId);
