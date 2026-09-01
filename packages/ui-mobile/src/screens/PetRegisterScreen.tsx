@@ -17,7 +17,9 @@ export interface PetRegisterScreenProps {
 }
 
 export const PetRegisterScreen: React.FC<PetRegisterScreenProps> = ({ onSuccess }) => {
-  const activeShelter = useShelterStore((state) => state.getActiveShelter());
+  const shelters = useShelterStore((state) => state.shelters);
+  const activeShelterId = useShelterStore((state) => state.activeShelterId);
+  const activeShelter = shelters.find((s) => s.id === activeShelterId) ?? null;
   const addPet = usePetStore((state) => state.addPet);
 
   const [name, setName] = useState("");

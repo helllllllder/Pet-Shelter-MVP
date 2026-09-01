@@ -22,9 +22,12 @@ export const PetDetailScreen: React.FC<PetDetailScreenProps> = ({
   petId,
   onBack,
 }) => {
-  const selectedId = usePetStore((state) => petId || state.selectedPetId);
-  const pet = usePetStore((state) => (selectedId ? state.getPetById(selectedId) : null));
+  const selectedPetId = usePetStore((state) => state.selectedPetId);
+  const allPets = usePetStore((state) => state.pets);
   const updatePet = usePetStore((state) => state.updatePet);
+
+  const activeId = petId || selectedPetId;
+  const pet = activeId ? allPets.find((p) => p.id === activeId) ?? null : null;
 
   // Care store
   const allOccurrences = useCareStore((state) => state.occurrences);

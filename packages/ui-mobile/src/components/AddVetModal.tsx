@@ -26,9 +26,10 @@ export const AddVetModal: React.FC<AddVetModalProps> = ({
   const activeShelterId = useShelterStore((state) => state.activeShelterId);
   const activeShelter = shelters.find((s) => s.id === activeShelterId) ?? null;
 
-  const clinics = useVetStore((state) =>
-    activeShelter ? state.clinics.filter((c) => c.shelterId === activeShelter.id) : []
-  );
+  const allClinics = useVetStore((state) => state.clinics);
+  const clinics = activeShelter
+    ? allClinics.filter((c) => c.shelterId === activeShelter.id)
+    : [];
   const addVeterinarian = useVetStore((state) => state.addVeterinarian);
 
   const [selectedClinicId, setSelectedClinicId] = useState(clinicId || "");
